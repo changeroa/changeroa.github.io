@@ -2,6 +2,6 @@
 name: Big 5 성격검사
 tools: [React, JavaScript, MongoDB, langchain]
 image: https://www.sketchappsources.com/resources/source-image/project-neon-groove-music-ui.png
-description: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-external_url: https://www.google.com
+description: Langchain, MERN 스택을 활용하여 Big5 성격검사 홈페이지 구현 연습
+external_url: 
 ---
