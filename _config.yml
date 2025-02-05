@@ -1,40 +1,37 @@
 ### Site Settings ###
-title               : 조재표의 공간
-description         : >-
-                      이것저것 컴퓨터로 제가 하는
-                      모든 것들을 다룹니다.
-                      
-baseurl             : ""            # Change to empty quotes if you are hosting your site at <your-username>.github.io directly
-repository          : changeroa/changeroa.github.io      # Change to <your-username>/<your-username>.github.io (or remove it if you don't need remote projects)
-remote_theme        : yousinix/portfolYOU
-open_new_tab        : false                    # Opens external URLs in new tab (works for posts, projects and navbar only)
+title: 조재표의 공간
+description: >-
+  이것저것 컴퓨터로 제가 하는
+  모든 것들을 다룹니다.
 
+baseurl: "" # Change to empty quotes if you are hosting your site at <your-username>.github.io directly
+repository: changeroa/changeroa.github.io # Change to <your-username>/<your-username>.github.io (or remove it if you don't need remote projects)
+remote_theme: yousinix/portfolYOU
+open_new_tab: false # Opens external URLs in new tab (works for posts, projects and navbar only)
 
 ### Plugins ###
 plugins:
   - jemoji
 
-
 ### Navbar Settings ###
-nav_exclude:                                            # The following paths are excluded from navbar
+nav_exclude: # The following paths are excluded from navbar
   - pages/tags.html
   - pages/404.html
   - pages/index.md
 
-
 ### Author Info ###
 author:
-  name              : Jo Jae Pyo
-  image             : https://i.imgur.com/uyDNQnn.jpg
-  behance           : your_username
-# dribbble          : your_username
-  email             : changeroa@gmail.com
-# facebook          : your_username
-  github            : changeroa
-# gitlab            : your_username
-  instagram         : jetbyo
-  kaggle            : changeroa/
-  linkedin          : Jae Pyo Cho
+  name: Jo Jae Pyo
+  image: "/assets/img/profile.jpg"
+  behance: your_username
+  # dribbble          : your_username
+  email: changeroa@gmail.com
+  # facebook          : your_username
+  github: changeroa
+  # gitlab            : your_username
+  instagram: jetbyo
+  kaggle: changeroa/
+  linkedin: Jae Pyo Cho
 # medium            : your_username
 # soundcloud        : your_username
 # spotify           : your_username
@@ -46,10 +43,8 @@ author:
 # youtube           : your_channel_name
 # keybase           : your_username
 
-
 ### Posts ###
 permalink: /blog/:title
-
 
 ### Collections ###
 collections:
@@ -59,15 +54,13 @@ collections:
 
 ### Disqus ###
 disqus:
-  shortname: your-short-name-disqus                     # Your website Shortname on disqus
-
+  shortname: your-short-name-disqus # Your website Shortname on disqus
 
 ### Analytics ###
 analytics:
-  enabled: false                                        # Set true to enable analytics
+  enabled: false # Set true to enable analytics
   google:
     tracking_id: your-google-tracking-id
-
 
 ### Buy me a coffee ###
 # See https://www.buymeacoffee.com/
@@ -75,9 +68,8 @@ buymeacoffee:
   enabled: false
   username: your_username
   color: "#007bff"
-  message: "Thank you for visiting."                    # Message to be displayed aside from the button for a few seconds.
+  message: "Thank you for visiting." # Message to be displayed aside from the button for a few seconds.
   description: "Support me on Buy me a coffee!"
-
 
 ### Defaults for collections ###
 defaults:
@@ -90,8 +82,7 @@ defaults:
       path: ""
       type: "posts"
     values:
-      comments: false                                   # Set to true to enable disqus comments
-
+      comments: false # Set to true to enable disqus comments
 
 ### Exclude from processing ###
 exclude:
