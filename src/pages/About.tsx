@@ -1,15 +1,9 @@
-import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const About = () => {
   return (
     <>
-      <Helmet>
-        <title>About - Full Stack Developer</title>
-        <meta name="description" content="풀스택 개발자 소개 - React, TypeScript, Node.js 전문" />
-      </Helmet>
-
       <div className="min-h-screen pt-20">
         <div className="section-padding">
           <div className="container-custom max-w-4xl">

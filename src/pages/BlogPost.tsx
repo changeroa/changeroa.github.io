@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -45,15 +44,6 @@ const BlogPost = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{post.title} - Blog</title>
-        <meta name="description" content={post.excerpt} />
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.excerpt} />
-        <meta property="og:type" content="article" />
-        {post.coverImage && <meta property="og:image" content={post.coverImage} />}
-      </Helmet>
-
       <article className="min-h-screen pt-20">
         {post.coverImage && (
           <motion.div

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import BlogCard from '../components/blog/BlogCard';
 import SearchBar from '../components/blog/SearchBar';
@@ -51,11 +50,6 @@ const Blog = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Blog - Tech Articles & Tutorials</title>
-        <meta name="description" content="기술 블로그 - React, TypeScript, Node.js 관련 개발 경험과 튜토리얼" />
-      </Helmet>
-
       <div className="min-h-screen pt-20">
         <div className="section-padding">
           <div className="container-custom">
