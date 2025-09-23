@@ -7,6 +7,57 @@ const About = () => {
     transition: { duration: 0.6 }
   };
 
+  // Skills data modeled after the referenced component
+  const skillSets = [
+    {
+      title: 'Language',
+      icon: '🧩',
+      items: [
+        { label: 'TypeScript', bg: '#2f74c0', fg: '#ffffff' },
+        { label: 'JavaScript', bg: '#efd81d', fg: '#000000' },
+        { label: 'Python', bg: '#3d75a4', fg: '#ffffff' },
+        { label: 'Java', bg: '#d13d35', fg: '#ffffff' },
+        { label: 'C', bg: '#ae36e0', fg: '#ffffff' },
+      ],
+    },
+    {
+      title: 'Frontend',
+      icon: '🎨',
+      items: [
+        { label: 'React', bg: '#000000', fg: '#ffffff' },
+        { label: 'React Router DOM', bg: '#f44250', fg: '#ffffff' },
+        { label: 'Redux Toolkit + React Redux', bg: '#49443e', fg: '#ffffff' },
+        { label: 'Tailwind CSS', bg: '#38bdf8', fg: '#ffffff' },
+        { label: 'Framer Motion', bg: '#c43bad', fg: '#ffffff' },
+        { label: 'Vite', bg: '#8869ee', fg: '#ffffff' },
+      ],
+    },
+    {
+      title: 'Backend',
+      icon: '⚙️',
+      items: [
+        { label: 'Express.js', bg: '#404d59', fg: '#ffffff' },
+        { label: 'FastAPI', bg: '#05998b', fg: '#ffffff' },
+        { label: 'LangChain', bg: '#1b5c3d', fg: '#ffffff' },
+        { label: 'Qdrant (Vector DB)', bg: '#ff6f61', fg: '#ffffff' },
+        { label: 'MongoDB', bg: '#4db33d', fg: '#ffffff' },
+      ],
+    },
+    {
+      title: 'Infra / DevOps',
+      icon: '☁️',
+      items: [
+        { label: 'AWS EC2', bg: '#FF9900', fg: '#000000' },
+        { label: 'AWS Lambda', bg: '#232F3E', fg: '#ffffff' },
+        { label: 'AWS VPC & Security Groups', bg: '#146eb4', fg: '#ffffff' },
+        { label: 'Nginx', bg: '#009639', fg: '#ffffff' },
+        { label: 'Docker & Docker Compose', bg: '#0db7ed', fg: '#ffffff' },
+        { label: 'GitHub Actions', bg: '#2088FF', fg: '#ffffff' },
+        { label: 'CloudWatch (Alarms)', bg: '#FF4F8B', fg: '#ffffff' },
+      ]
+    },
+  ];
+
   return (
     <section id="about" className="section-padding bg-cream-50/90 dark:bg-cocoa-900/90 backdrop-blur-sm">
       <div className="container-custom">
@@ -28,17 +79,34 @@ const About = () => {
             <div className="relative w-full max-w-md mx-auto">
               <div className="absolute inset-0 bg-gradient-to-br from-cream-300 to-lavender-300 rounded-2xl opacity-30 blur-2xl" />
               <div className="relative bg-cream-50/80 dark:bg-cocoa-800/80 backdrop-blur-md rounded-2xl p-8 border border-cream-300/50 dark:border-cocoa-700/50">
-                <div className="text-center space-y-2">
-                  <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4">
-                    <h1 className="text-3xl md:text-4xl font-bold text-cocoa-700 dark:text-cream-100">
-                      Victor Jaepyo Jo
-                    </h1>
-                    <div className="hidden md:block w-px h-8 bg-terra-300 dark:bg-terra-600"></div>
-                    <p className="text-xl md:text-2xl font-semibold text-cocoa-600 dark:text-cream-200">
-                      Full Stack Developer
-                    </p>
+                <h2 className="text-2xl md:text-3xl font-extrabold text-center text-cocoa-800 dark:text-cream-100 inline-block pb-2 border-b-2 border-cream-300 dark:border-cocoa-700">
+                  ABOUT ME
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-2 gap-x-8 gap-y-3 mt-6">
+                  <div className="flex items-center gap-3 text-cocoa-700 dark:text-cream-100">
+                    <span className="text-lg">👤</span>
+                    <span className="text-sm md:text-base">이름: 조재표(Victor Jaepyo Jo)</span>
                   </div>
-    
+                  <div className="flex items-center gap-3 text-cocoa-700 dark:text-cream-100">
+                    <span className="text-lg">📅</span>
+                    <span className="text-sm md:text-base">생년월일: 98.05.13</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-cocoa-700 dark:text-cream-100">
+                    <span className="text-lg">📍</span>
+                    <span className="text-sm md:text-base">위치: 서울특별시 노원구</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-cocoa-700 dark:text-cream-100">
+                    <span className="text-lg">📞</span>
+                    <span className="text-sm md:text-base">연락처: 010-5545-0513</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-cocoa-700 dark:text-cream-100">
+                    <span className="text-lg">✉️</span>
+                    <span className="text-sm md:text-base break-all">이메일: changeroa@gmail.com</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-cocoa-700 dark:text-cream-100">
+                    <span className="text-lg">🎓</span>
+                    <span className="text-sm md:text-base">학력: 한국외국어대학교 (중국어통번역, 컴퓨터공학)</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -51,132 +119,35 @@ const About = () => {
             viewport={{ once: true }}
           >
             <div className="space-y-8">
+              {/* 기술 스택 (참고 레이아웃 반영) */}
               <div>
-                <h3 className="text-xl md:text-2xl font-bold mb-4 bg-gradient-to-r from-terra-500 to-lavender-500 bg-clip-text text-transparent">
-                  학력
+                <h3 className="text-xl md:text-2xl font-bold mb-4" style={{ color: '#000000' }}>
+                  SKILLS
                 </h3>
-                <div className="space-y-4">
-                  <div className="group bg-gradient-to-r from-lavender-50/80 to-cream-50/80 dark:from-lavender-900/20 dark:to-cream-900/20 rounded-xl p-4 border border-lavender-200/50 dark:border-lavender-700/30 hover:shadow-md transition-all duration-300">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-lavender-400 to-lavender-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:rotate-6 transition-transform">
-                        <span className="text-2xl">🎓</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {skillSets.map((set) => (
+                    <div key={set.title} className="glass-effect rounded-2xl p-6 border border-cream-300/50 dark:border-cocoa-700/40">
+                      <div className="flex items-center gap-2 text-cocoa-800 dark:text-cream-100 mb-4">
+                        <span className="text-2xl" aria-hidden>{set.icon}</span>
+                        <div className="text-base md:text-lg font-semibold">{set.title}</div>
                       </div>
-                      <div className="flex-1">
-                        <h4 className="font-bold text-base md:text-lg text-cocoa-700 dark:text-cream-100">
-                          한국외국어대학교 (Hankuk University of Foreign Studies)
-                        </h4>
-                        <p className="text-sm md:text-base text-terra-600 dark:text-terra-400 font-medium mt-1">
-                          중국어통번역학과, 컴퓨터공학 복수전공
-                        </p>
-                        <p className="text-xs md:text-sm text-cocoa-500 dark:text-cream-400 mt-1">
-                          2019년 3월 - 2026년 2월
-                        </p>
-                        <div className="mt-2 inline-flex items-center gap-2 bg-cream-100/80 dark:bg-cocoa-700/50 rounded-lg px-3 py-1">
-                          <span className="text-xs font-medium text-cocoa-600 dark:text-cream-300">
-                            동아리: DAT - Data Analysis & Technology
-                          </span>
-                        </div>
-                      </div>
+                      <ul className="flex flex-wrap gap-2">
+                        {set.items.map((item) => (
+                          <li
+                            key={item.label}
+                            className="px-3 py-1 rounded-full text-xs md:text-sm font-medium shadow-sm"
+                            style={{ backgroundColor: item.bg, color: item.fg }}
+                          >
+                            {item.label}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                  </div>
-
-                  <div className="group bg-gradient-to-r from-sage-50/80 to-cream-50/80 dark:from-sage-900/20 dark:to-cream-900/20 rounded-xl p-4 border border-sage-200/50 dark:border-sage-700/30 hover:shadow-md transition-all duration-300">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-sage-400 to-sage-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:rotate-6 transition-transform">
-                        <span className="text-2xl">🏫</span>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-bold text-base md:text-lg text-cocoa-700 dark:text-cream-100">
-                          서울외국어고등학교 (Seoul Foreign Language High School)
-                        </h4>
-                        <p className="text-sm md:text-base text-terra-600 dark:text-terra-400 font-medium mt-1">
-                          일본어과 졸업
-                        </p>
-                        <p className="text-xs md:text-sm text-cocoa-500 dark:text-cream-400 mt-1">
-                          2014년 3월 - 2017년 2월
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-xl md:text-2xl font-bold mb-4 bg-gradient-to-r from-lavender-500 to-terra-500 bg-clip-text text-transparent">
-                  핵심 가치
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="group bg-cream-50/60 dark:bg-cocoa-800/60 backdrop-blur-sm rounded-xl p-4 border border-cream-200 dark:border-cocoa-700 hover:shadow-md hover:scale-[1.01] transition-all duration-300">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-lavender-400 to-lavender-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:rotate-6 transition-transform">
-                        <span className="text-xl">🤖</span>
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-sm text-cocoa-700 dark:text-cream-100 mb-1">AI와의 협업</h4>
-                        <p className="text-xs text-cocoa-600 dark:text-cream-300 leading-relaxed">
-                          AI를 파트너로 두고 반복 구현은 위임, 설계·판단에 집중
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="group bg-cream-50/60 dark:bg-cocoa-800/60 backdrop-blur-sm rounded-xl p-4 border border-cream-200 dark:border-cocoa-700 hover:shadow-md hover:scale-[1.01] transition-all duration-300">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-terra-400 to-terra-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:rotate-6 transition-transform">
-                        <span className="text-xl">🎯</span>
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-sm text-cocoa-700 dark:text-cream-100 mb-1">문제 정의</h4>
-                        <p className="text-xs text-cocoa-600 dark:text-cream-300 leading-relaxed">
-                          문제를 구조적으로 분해하고 실험 가능한 단위로 재설계
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="group bg-cream-50/60 dark:bg-cocoa-800/60 backdrop-blur-sm rounded-xl p-4 border border-cream-200 dark:border-cocoa-700 hover:shadow-md hover:scale-[1.01] transition-all duration-300">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-sage-400 to-sage-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:rotate-6 transition-transform">
-                        <span className="text-xl">📚</span>
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-sm text-cocoa-700 dark:text-cream-100 mb-1">주체적 학습</h4>
-                        <p className="text-xs text-cocoa-600 dark:text-cream-300 leading-relaxed">
-                          기초부터 트렌드까지 필요한 영역을 지속적으로 학습
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="group bg-cream-50/60 dark:bg-cocoa-800/60 backdrop-blur-sm rounded-xl p-4 border border-cream-200 dark:border-cocoa-700 hover:shadow-md hover:scale-[1.01] transition-all duration-300">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-cream-400 to-cream-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:rotate-6 transition-transform">
-                        <span className="text-xl">🚀</span>
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-sm text-cocoa-700 dark:text-cream-100 mb-1">빠른 실행</h4>
-                        <p className="text-xs text-cocoa-600 dark:text-cream-300 leading-relaxed">
-                          아이디어를 빠르게 프로토타입으로 구현하고 반복 개선
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-r from-cream-100 to-lavender-50 dark:from-cocoa-800/20 dark:to-lavender-900/20 rounded-xl p-4 border border-cream-300/50 dark:border-cocoa-700/30">
-                <h3 className="text-xl md:text-2xl font-bold mb-3 bg-gradient-to-r from-sage-500 to-lavender-500 bg-clip-text text-transparent">
-                  현재 관심사
-                </h3>
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-terra-400 to-lavender-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <span className="text-xl">🔬</span>
-                  </div>
-                  <p className="text-sm md:text-base text-cocoa-600 dark:text-cream-300 leading-relaxed">
-                    최근에는 Coding-agent 툴의 한계 및 적절한 활용법을 실험적으로 탐구하는 데에 관심이 있습니다.
-                  </p>
-                </div>
-              </div>
+              
             </div>
           </motion.div>
         </div>
