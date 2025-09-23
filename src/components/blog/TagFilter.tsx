@@ -11,8 +11,8 @@ const TagFilter = ({ tags, selectedTag, setSelectedTag }: TagFilterProps) => {
         onClick={() => setSelectedTag('')}
         className={`px-4 py-2 rounded-full font-medium transition-all ${
           selectedTag === ''
-            ? 'bg-primary text-white dark:bg-primary-dark'
-            : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+            ? 'bg-terra-500 text-white dark:bg-terra-600'
+            : 'bg-cream-100 dark:bg-cocoa-800 text-cocoa-600 dark:text-cream-300 hover:bg-cream-200 dark:hover:bg-cocoa-700'
         }`}
       >
         All Posts
@@ -23,8 +23,8 @@ const TagFilter = ({ tags, selectedTag, setSelectedTag }: TagFilterProps) => {
           onClick={() => setSelectedTag(tag === selectedTag ? '' : tag)}
           className={`px-4 py-2 rounded-full font-medium transition-all ${
             selectedTag === tag
-              ? 'bg-primary text-white dark:bg-primary-dark'
-              : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+              ? 'bg-terra-500 text-white dark:bg-terra-600'
+              : 'bg-cream-100 dark:bg-cocoa-800 text-cocoa-600 dark:text-cream-300 hover:bg-cream-200 dark:hover:bg-cocoa-700'
           }`}
         >
           {tag}

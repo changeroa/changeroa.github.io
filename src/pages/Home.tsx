@@ -5,6 +5,7 @@ import Skills from '../components/portfolio/Skills';
 import Projects from '../components/portfolio/Projects';
 import Experience from '../components/portfolio/Experience';
 import Contact from '../components/portfolio/Contact';
+import AnimatedBackground from '../components/shared/AnimatedBackground';
 
 const Home = () => {
   return (
@@ -16,6 +17,8 @@ const Home = () => {
         <meta property="og:description" content="풀스택 개발자 조재표 포트폴리오 블로그" />
         <meta property="og:type" content="website" />
       </Helmet>
+      
+      <AnimatedBackground />
       
       <Hero />
       <About />

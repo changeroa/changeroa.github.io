@@ -7,7 +7,6 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import { getPostBySlug } from '../utils/blogUtils';
 import type { BlogPost as BlogPostType } from '../types/blog';
-import 'highlight.js/styles/github-dark.css';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();

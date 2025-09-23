@@ -34,12 +34,12 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+    <footer className="bg-cream-100 dark:bg-cocoa-800 border-t border-cream-300 dark:border-cocoa-700">
       <div className="container-custom py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
-            <h3 className="text-2xl font-bold gradient-text mb-4">Portfolio</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-terra-500 to-lavender-500 bg-clip-text text-transparent mb-4">Portfolio</h3>
+            <p className="text-cocoa-600 dark:text-cream-300 mb-4">
               풀스택 개발자 포트폴리오 & 기술 블로그
             </p>
             <div className="flex space-x-4">
@@ -49,7 +49,7 @@ const Footer = () => {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-dark transition-colors"
+                  className="text-cocoa-600 dark:text-cream-300 hover:text-terra-500 dark:hover:text-terra-400 transition-colors"
                   aria-label={link.name}
                 >
                   {link.icon}
@@ -59,20 +59,20 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Quick Links</h4>
+            <h4 className="font-semibold text-cocoa-700 dark:text-cream-100 mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-dark transition-colors">
+                <Link to="/" className="text-cocoa-600 dark:text-cream-300 hover:text-terra-500 dark:hover:text-terra-400 transition-colors">
                   Home
                 </Link>
               </li>
               <li>
-                <Link to="/blog" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-dark transition-colors">
+                <Link to="/blog" className="text-cocoa-600 dark:text-cream-300 hover:text-terra-500 dark:hover:text-terra-400 transition-colors">
                   Blog
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-dark transition-colors">
+                <Link to="/about" className="text-cocoa-600 dark:text-cream-300 hover:text-terra-500 dark:hover:text-terra-400 transition-colors">
                   About
                 </Link>
               </li>
@@ -80,8 +80,8 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Tech Stack</h4>
-            <ul className="space-y-2 text-gray-600 dark:text-gray-400">
+            <h4 className="font-semibold text-cocoa-700 dark:text-cream-100 mb-4">Tech Stack</h4>
+            <ul className="space-y-2 text-cocoa-600 dark:text-cream-300">
               <li>React & TypeScript</li>
               <li>Node.js & Express</li>
               <li>AWS & Docker</li>
@@ -90,8 +90,8 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 text-center">
-          <p className="text-gray-600 dark:text-gray-400">
+        <div className="mt-8 pt-8 border-t border-cream-300 dark:border-cocoa-700 text-center">
+          <p className="text-cocoa-600 dark:text-cream-300">
             © {currentYear} Portfolio. All rights reserved.
           </p>
         </div>

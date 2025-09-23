@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const About = () => {
   return (
@@ -41,16 +41,50 @@ const About = () => {
                 </p>
               </div>
 
+              <div className="glass-effect rounded-2xl p-8 mb-8">
+                <h2 className="text-2xl font-bold mb-4">학력</h2>
+                <div className="space-y-6">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4">
+                      <span className="text-xl">🎓</span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold mb-1">한국외국어대학교 (Hankuk University of Foreign Studies)</h3>
+                      <p className="text-primary dark:text-primary-dark font-medium mb-1">
+                        중국어통번역학과, 컴퓨터공학 복수전공
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">2019년 3월 - 2026년 2월</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <strong>동아리 및 학회:</strong> DAT - Data Analysis & Technology
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4">
+                      <span className="text-xl">🏫</span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold mb-1">서울외국어고등학교 (Seoul Foreign Language High School)</h3>
+                      <p className="text-primary dark:text-primary-dark font-medium mb-1">
+                        일본어과 졸업
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">2014년 3월 - 2017년 2월</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div className="glass-effect rounded-2xl p-6">
                   <h3 className="text-xl font-semibold mb-3 flex items-center">
-                    <span className="text-2xl mr-2">🎓</span>
-                    교육
+                    <span className="text-2xl mr-2">📚</span>
+                    전공 역량
                   </h3>
                   <ul className="space-y-2 text-gray-600 dark:text-gray-400">
-                    <li>컴퓨터공학 학사 (2016-2020)</li>
-                    <li>AWS Certified Solutions Architect</li>
-                    <li>Google Cloud Professional Developer</li>
+                    <li>중국어 통번역 전문 역량</li>
+                    <li>컴퓨터공학 복수전공</li>
+                    <li>데이터 분석 및 기술 역량</li>
                   </ul>
                 </div>
 

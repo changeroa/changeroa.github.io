@@ -6,33 +6,43 @@ const Skills = () => {
       title: 'Frontend',
       icon: '🎨',
       skills: [
-        { name: 'React', level: 90 },
-        { name: 'TypeScript', level: 85 },
-        { name: 'Next.js', level: 80 },
-        { name: 'Vue.js', level: 70 },
-        { name: 'Tailwind CSS', level: 95 },
+        'React',
+        'TypeScript',
+        'React Native',
+        'Tailwind CSS',
+        'Redux Toolkit',
+        'TanStack Query',
       ],
     },
     {
-      title: 'Backend',
+      title: 'Backend & AI',
       icon: '⚙️',
       skills: [
-        { name: 'Node.js', level: 85 },
-        { name: 'Express', level: 80 },
-        { name: 'Python', level: 75 },
-        { name: 'PostgreSQL', level: 80 },
-        { name: 'MongoDB', level: 75 },
+        'Node.js / Express',
+        'FastAPI (Python)',
+        'PyTorch',
+        'TensorFlow',
+        'LangChain / RAG',
       ],
     },
     {
-      title: 'DevOps',
+      title: 'DevOps & Cloud',
       icon: '☁️',
       skills: [
-        { name: 'AWS', level: 80 },
-        { name: 'Docker', level: 85 },
-        { name: 'CI/CD', level: 75 },
-        { name: 'Kubernetes', level: 60 },
-        { name: 'Git', level: 95 },
+        'AWS (EC2, Lambda)',
+        'Docker',
+        'GitHub Actions (CI/CD)',
+        'Nginx / Reverse Proxy',
+        'TLS / HTTPS Config',
+        'Cloudflare / Domain Mgmt',
+      ],
+    },
+    {
+      title: 'Databases',
+      icon: '🗄️',
+      skills: [
+        'MongoDB (Mongoose)',
+        'Qdrant (Vector DB)',
       ],
     },
   ];
@@ -47,10 +57,10 @@ const Skills = () => {
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
         >
-          Technical <span className="gradient-text">Skills</span>
+          Technical <span className="bg-gradient-to-r from-terra-500 to-lavender-500 bg-clip-text text-transparent">Skills</span>
         </motion.h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
           {skillCategories.map((category, categoryIndex) => (
             <motion.div
               key={category.title}
@@ -65,31 +75,14 @@ const Skills = () => {
                 <h3 className="text-xl font-semibold">{category.title}</h3>
               </div>
 
-              <div className="space-y-4">
-                {category.skills.map((skill, skillIndex) => (
-                  <div key={skill.name}>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {skill.name}
-                      </span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {skill.level}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-                      <motion.div
-                        className="h-2 gradient-bg rounded-full"
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${skill.level}%` }}
-                        transition={{ 
-                          duration: 1, 
-                          delay: categoryIndex * 0.2 + skillIndex * 0.1,
-                          ease: "easeOut"
-                        }}
-                        viewport={{ once: true }}
-                      />
-                    </div>
-                  </div>
+              <div className="flex flex-wrap gap-2">
+                {category.skills.map((skill) => (
+                  <span
+                    key={skill}
+                    className="px-3 py-1 bg-cream-100 dark:bg-cocoa-800 text-cocoa-600 dark:text-cream-300 rounded-full text-sm font-medium hover:bg-terra-500 hover:text-white dark:hover:bg-terra-400 transition-colors"
+                  >
+                    {skill}
+                  </span>
                 ))}
               </div>
             </motion.div>
@@ -105,10 +98,20 @@ const Skills = () => {
         >
           <h3 className="text-xl font-semibold mb-4">Other Technologies & Tools</h3>
           <div className="flex flex-wrap justify-center gap-3">
-            {['Redux', 'GraphQL', 'Jest', 'Webpack', 'Vite', 'Figma', 'Postman', 'Linux', 'Nginx'].map((tool) => (
+            {[
+              'GraphQL', 
+              'Jest', 
+              'Webpack', 
+              'Vite', 
+              'Figma', 
+              'Postman', 
+              'Linux (Ubuntu)', 
+              'code-server', 
+              'Bash Scripting'
+            ].map((tool) => (
               <span
                 key={tool}
-                className="px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full text-sm font-medium hover:bg-primary hover:text-white dark:hover:bg-primary-dark transition-colors cursor-pointer"
+                className="px-4 py-2 bg-cream-100 dark:bg-cocoa-800 text-cocoa-600 dark:text-cream-300 rounded-full text-sm font-medium hover:bg-terra-500 hover:text-white dark:hover:bg-terra-400 transition-colors cursor-pointer"
               >
                 {tool}
               </span>

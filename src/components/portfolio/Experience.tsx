@@ -35,11 +35,11 @@ const Experience = () => {
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
         >
-          Work <span className="gradient-text">Experience</span>
+          Work <span className="bg-gradient-to-r from-terra-500 to-lavender-500 bg-clip-text text-transparent">Experience</span>
         </motion.h2>
 
         <div className="relative">
-          <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-gray-300 dark:bg-gray-700" />
+          <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-cream-300 dark:bg-cocoa-700" />
           
           {experiences.map((exp, index) => (
             <motion.div
@@ -54,17 +54,17 @@ const Experience = () => {
             >
               <div className={`w-full md:w-1/2 ${index % 2 === 0 ? 'pr-8 text-right' : 'pl-8'}`}>
                 <div className="glass-effect rounded-2xl p-6 hover-lift">
-                  <span className="text-sm font-medium text-primary dark:text-primary-dark">
+                  <span className="text-sm font-medium text-terra-500 dark:text-terra-400">
                     {exp.year}
                   </span>
                   <h3 className="text-xl font-semibold mt-2 mb-1">{exp.title}</h3>
-                  <h4 className="text-lg text-gray-600 dark:text-gray-400 mb-3">{exp.company}</h4>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">{exp.description}</p>
+                  <h4 className="text-lg text-cocoa-600 dark:text-cream-300 mb-3">{exp.company}</h4>
+                  <p className="text-cocoa-600 dark:text-cream-300 mb-4">{exp.description}</p>
                   <div className="flex flex-wrap gap-2 justify-end">
                     {exp.technologies.map((tech) => (
                       <span
                         key={tech}
-                        className="px-3 py-1 text-xs font-medium bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-dark rounded-full"
+                        className="px-3 py-1 text-xs font-medium bg-terra-500/10 dark:bg-terra-500/20 text-terra-600 dark:text-terra-400 rounded-full"
                       >
                         {tech}
                       </span>
@@ -73,7 +73,7 @@ const Experience = () => {
                 </div>
               </div>
               
-              <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-primary dark:bg-primary-dark rounded-full border-4 border-white dark:border-gray-900" />
+              <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-terra-500 dark:bg-terra-400 rounded-full border-4 border-cream-50 dark:border-cocoa-900" />
             </motion.div>
           ))}
         </div>

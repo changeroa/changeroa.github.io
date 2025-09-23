@@ -62,14 +62,14 @@ const Navigation = () => {
                 to={link.path}
                 className={`relative px-3 py-2 text-sm font-medium transition-colors ${
                   location.pathname === link.path
-                    ? 'text-primary dark:text-primary-dark'
-                    : 'text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-dark'
+                    ? 'text-terra-500 dark:text-cream-300'
+                    : 'text-cocoa-600 dark:text-cream-200 hover:text-terra-500 dark:hover:text-cream-100'
                 }`}
               >
                 {link.label}
                 {location.pathname === link.path && (
                   <motion.div
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary dark:bg-primary-dark"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-terra-500 dark:bg-cream-300"
                     layoutId="navbar-indicator"
                   />
                 )}
@@ -77,7 +77,7 @@ const Navigation = () => {
             ))}
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              className="p-2 rounded-lg bg-cream-200 dark:bg-cocoa-700 hover:bg-cream-300 dark:hover:bg-cocoa-600 transition-colors"
               aria-label="Toggle dark mode"
             >
               {isDarkMode ? (
@@ -94,7 +94,7 @@ const Navigation = () => {
 
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-cream-200 dark:hover:bg-cocoa-700 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               {isMobileMenuOpen ? (
@@ -111,7 +111,7 @@ const Navigation = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700"
+            className="md:hidden py-4 border-t border-cream-300 dark:border-cocoa-700"
           >
             {navLinks.map((link) => (
               <Link
@@ -120,8 +120,8 @@ const Navigation = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`block px-3 py-2 text-base font-medium rounded-lg transition-colors ${
                   location.pathname === link.path
-                    ? 'text-primary dark:text-primary-dark bg-gray-100 dark:bg-gray-800'
-                    : 'text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-dark hover:bg-gray-100 dark:hover:bg-gray-800'
+                    ? 'text-terra-500 dark:text-cream-300 bg-cream-100 dark:bg-cocoa-800'
+                    : 'text-cocoa-600 dark:text-cream-200 hover:text-terra-500 dark:hover:text-cream-100 hover:bg-cream-100 dark:hover:bg-cocoa-800'
                 }`}
               >
                 {link.label}
@@ -129,9 +129,9 @@ const Navigation = () => {
             ))}
             <button
               onClick={toggleDarkMode}
-              className="w-full mt-2 p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-left"
+              className="w-full mt-2 p-2 rounded-lg bg-cream-200 dark:bg-cocoa-700 hover:bg-cream-300 dark:hover:bg-cocoa-600 transition-colors text-left"
             >
-              {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+              {isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
             </button>
           </motion.div>
         )}
