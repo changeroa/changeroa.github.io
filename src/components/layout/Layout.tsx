@@ -13,7 +13,7 @@ const Layout: React.FC = () => {
                     <nav className="flex items-center gap-6 text-sm font-medium">
                         <Link to="/" className="hover:text-primary transition-colors">Portfolio</Link>
                         <Link to="/blog" className="hover:text-primary transition-colors">Blog</Link>
-                        <Link to="/garden" className="hover:text-primary transition-colors">Digital Garden</Link>
+                        <a href="/garden" className="hover:text-primary transition-colors">Digital Garden</a>
                     </nav>
                 </div>
             </header>
