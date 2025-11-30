@@ -1,249 +1,100 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@config "../tailwind.config.js";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --radius: 0.5rem;
   }
-  
+
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
   body {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-family: Inter, system-ui, sans-serif;
-  }
-}
-
-@layer components {
-  .gradient-text {
-    background-image: linear-gradient(to right, #E67E5B, #9F89BD);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    display: inline-block;
-  }
-  
-  .gradient-bg {
-    background: linear-gradient(to bottom right, #FDECD4, #E67E5B, #9F89BD);
-  }
-  
-  .glass-effect {
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    background-color: rgba(253, 236, 212, 0.3);
-    border: 1px solid rgba(253, 236, 212, 0.5);
-  }
-  
-  .dark .glass-effect {
-    background-color: rgba(36, 29, 24, 0.7);
-    border: 1px solid rgba(74, 61, 51, 0.5);
-  }
-  
-  .hover-lift {
-    transition: all 0.3s ease;
-  }
-  
-  .hover-lift:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  }
-  
-  .section-padding {
-    padding: 4rem 1rem;
-  }
-  
-  @media (min-width: 640px) {
-    .section-padding {
-      padding: 5rem 1.5rem;
-    }
-  }
-  
-  @media (min-width: 1024px) {
-    .section-padding {
-      padding: 6rem 2rem;
-    }
-  }
-  
-  .container-custom {
-    max-width: 80rem;
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-
-@layer utilities {
-  /* Ensure gradient text renders across browsers */
-  .bg-clip-text {
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    display: inline-block;
-  }
-  /* Desktop wave animations - dramatic */
-  @keyframes wave-slow {
-    0%, 100% {
-      transform: translateY(0%) translateX(0) scale(1) rotate(0deg);
-    }
-    25% {
-      transform: translateY(-5%) translateX(-5%) scale(1.05) rotate(1deg);
-    }
-    50% {
-      transform: translateY(5%) translateX(3%) scale(0.98) rotate(-1deg);
-    }
-    75% {
-      transform: translateY(-2%) translateX(-2%) scale(1.02) rotate(0.5deg);
-    }
-  }
-
-  @keyframes wave-medium {
-    0%, 100% {
-      transform: translateY(0%) translateX(0) scale(1) rotate(0deg);
-    }
-    33% {
-      transform: translateY(-2%) translateX(4%) scale(1.03) rotate(-0.5deg);
-    }
-    66% {
-      transform: translateY(2%) translateX(-6%) scale(0.97) rotate(1deg);
-    }
-  }
-
-  @keyframes wave-fast {
-    0%, 100% {
-      transform: translateY(0%) translateX(0) scale(1);
-    }
-    20% {
-      transform: translateY(-2%) translateX(-3%) scale(1.02);
-    }
-    40% {
-      transform: translateY(2%) translateX(2%) scale(0.99);
-    }
-    60% {
-      transform: translateY(-1%) translateX(5%) scale(1.01);
-    }
-    80% {
-      transform: translateY(1%) translateX(-4%) scale(0.98);
-    }
-  }
-
-  /* Mobile wave animations - subtle */
-  @keyframes wave-slow-mobile {
-    0%, 100% {
-      transform: translateY(50%) translateX(0);
-    }
-    50% {
-      transform: translateY(52%) translateX(2%);
-    }
-  }
-
-  @keyframes wave-medium-mobile {
-    0%, 100% {
-      transform: translateY(60%) translateX(0);
-    }
-    50% {
-      transform: translateY(58%) translateX(-2%);
-    }
-  }
-
-  @keyframes wave-fast-mobile {
-    0%, 100% {
-      transform: translateY(70%) translateX(0);
-    }
-    50% {
-      transform: translateY(71%) translateX(1%);
-    }
-  }
-
-  /* Shimmer effect for desktop */
-  @keyframes shimmer {
-    0% {
-      background-position: -200% center;
-    }
-    100% {
-      background-position: 200% center;
-    }
-  }
-
-  /* Animation classes */
-  .animate-wave-slow {
-    animation: wave-slow 25s ease-in-out infinite;
-  }
-
-  .animate-wave-medium {
-    animation: wave-medium 20s ease-in-out infinite;
-  }
-
-  .animate-wave-fast {
-    animation: wave-fast 15s ease-in-out infinite;
-  }
-
-  .animate-wave-slow-mobile {
-    animation: wave-slow-mobile 30s ease-in-out infinite;
-  }
-
-  .animate-wave-medium-mobile {
-    animation: wave-medium-mobile 25s ease-in-out infinite;
-  }
-
-  .animate-wave-fast-mobile {
-    animation: wave-fast-mobile 20s ease-in-out infinite;
-  }
-
-  .animate-shimmer {
-    animation: shimmer 8s linear infinite;
-  }
-
-  /* Gradient animation */
-  @keyframes gradient {
-    0%, 100% {
-      background-size: 200% 200%;
-      background-position: left center;
-    }
-    50% {
-      background-size: 200% 200%;
-      background-position: right center;
-    }
-  }
-
-  .animate-gradient {
-    background-size: 200% 200%;
-    animation: gradient 3s ease infinite;
-  }
-}
-
-@layer components {
-  /* Fallback styling for markdown content and code blocks (when highlight.css is absent) */
-  .prose pre {
-    background-color: #241D18; /* cocoa-900 */
-    color: #FEFCF3; /* cream-100-ish */
-    border-radius: 0.75rem;
-    padding: 1rem;
-    overflow-x: auto;
-  }
-  .dark .prose pre {
-    background-color: #362C25; /* cocoa-800 */
-  }
-  .prose code {
-    background-color: #FEFCF3; /* cream-50/100 */
-    color: #4A3D33; /* cocoa DEFAULT */
-    border-radius: 0.375rem;
-    padding: 0.125rem 0.375rem;
-  }
-  .dark .prose code {
-    background-color: #362C25; /* cocoa-800 */
-    color: #FDECD4; /* cream-200 */
-  }
-  .prose pre code {
-    background: transparent;
-    padding: 0;
-  }
-  .prose a {
-    color: #E67E5B; /* primary DEFAULT */
-  }
-  .prose a:hover {
-    color: #C26347; /* primary dark */
+    @apply bg-background text-foreground;
   }
 }
