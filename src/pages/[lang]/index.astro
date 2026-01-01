@@ -1,13 +1,21 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import IntroLink from '../components/IntroLink.astro';
-import SocialIcon from '../components/icons/SocialIcons.astro';
-import { useTranslations } from '../i18n/translations';
-import { site, socials } from '../data/site';
-import { getIntroLinks } from '../data/navigation';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import IntroLink from '../../components/IntroLink.astro';
+import SocialIcon from '../../components/icons/SocialIcons.astro';
+import { useTranslations, type Lang } from '../../i18n/translations';
+import { site, socials } from '../../data/site';
+import { getIntroLinks } from '../../data/navigation';
 
-const lang = 'ko';
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'ko' } },
+    { params: { lang: 'en' } }
+  ];
+}
+
+const { lang } = Astro.params as { lang: Lang };
 const t = useTranslations(lang);
+
 const links = getIntroLinks(lang);
 const names = site.displayNames[lang];
 ---

@@ -1,0 +1,357 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  image?: string;
+  github?: string;
+  demo?: string;
+  technologies: string[];
+  closeLabel?: string;
+  githubLabel?: string;
+  demoLabel?: string;
+}
+
+const {
+  id,
+  title,
+  image,
+  github,
+  demo,
+  technologies,
+  closeLabel = '닫기',
+  githubLabel = 'GitHub',
+  demoLabel = '데모 보기'
+} = Astro.props;
+---
+
+<div id={`modal-${id}`} class="modal-backdrop" data-modal={id} aria-hidden="true">
+  <div class="modal-container">
+    <button class="modal-close" aria-label={closeLabel} data-cursor-hover>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    
+    <div class="modal-content">
+      {image && (
+        <div class="modal-image-wrapper">
+          <img src={image} alt={title} />
+          <div class="modal-links">
+            {github && (
+              <a href={github} target="_blank" rel="noopener noreferrer" class="modal-link-btn github">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                <span>{githubLabel}</span>
+              </a>
+            )}
+            {demo && (
+              <a href={demo} target="_blank" rel="noopener noreferrer" class="modal-link-btn demo">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                <span>{demoLabel}</span>
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+      
+      <div class="modal-details">
+        <h2 class="modal-title">{title}</h2>
+        {technologies.length > 0 && (
+          <div class="modal-tags">
+            {technologies.map((tech) => (
+              <span class="modal-tag">{tech}</span>
+            ))}
+          </div>
+        )}
+        <div class="modal-description prose">
+          <slot />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function initModals() {
+    const triggers = document.querySelectorAll('[data-modal-trigger]');
+    const modals = document.querySelectorAll('.modal-backdrop');
+    const body = document.body;
+
+    function openModal(id: string) {
+      const modal = document.getElementById(`modal-${id}`);
+      if (!modal) return;
+      
+      modal.classList.add('active');
+      body.style.overflow = 'hidden';
+      
+      requestAnimationFrame(() => {
+        modal.classList.add('visible');
+      });
+    }
+
+    function closeModal(modal: Element) {
+      modal.classList.remove('visible');
+      setTimeout(() => {
+        modal.classList.remove('active');
+        body.style.overflow = '';
+      }, 300);
+    }
+
+    triggers.forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const id = (trigger as HTMLElement).dataset.modalTrigger;
+        if (id) openModal(id);
+      });
+    });
+
+    modals.forEach(modal => {
+      const closeBtn = modal.querySelector('.modal-close');
+      
+      closeBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeModal(modal);
+      });
+      
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal(modal);
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        modals.forEach(modal => {
+          if (modal.classList.contains('active')) {
+            closeModal(modal);
+          }
+        });
+      }
+    });
+  }
+
+  initModals();
+  document.addEventListener('astro:page-load', initModals);
+</script>
+
+<style>
+  .modal-backdrop {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+  }
+
+  .modal-backdrop.active {
+    display: flex;
+  }
+
+  .modal-backdrop.visible {
+    opacity: 1;
+  }
+
+  .modal-container {
+    width: 100%;
+    max-width: 1000px;
+    max-height: calc(100vh - var(--header-height) - 3rem);
+    background: var(--color-surface);
+    border-radius: 20px;
+    position: relative;
+    overflow-y: auto;
+    transform: scale(0.95) translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-xl);
+  }
+  
+  :global(.dark) .modal-container {
+    background: var(--color-surface-dark);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .modal-backdrop.visible .modal-container {
+    transform: scale(1) translateY(0);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 50;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--color-text);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: none;
+  }
+  
+  :global(.dark) .modal-close {
+    background: rgba(255,255,255,0.1);
+  }
+
+  .modal-close:hover {
+    transform: rotate(90deg);
+    background: var(--color-accent);
+    color: white;
+  }
+
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-image-wrapper {
+    width: 100%;
+    height: 320px;
+    position: relative;
+    background: #000;
+    overflow: hidden;
+  }
+
+  .modal-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.9;
+  }
+
+  .modal-links {
+    position: absolute;
+    bottom: 2rem;
+    right: 2rem;
+    display: flex;
+    gap: 1rem;
+  }
+
+  .modal-link-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+  }
+
+  .modal-link-btn:hover {
+    transform: translateY(-2px);
+  }
+  
+  .modal-link-btn.github {
+    background: #24292e;
+    color: white;
+  }
+  
+  .modal-link-btn.demo {
+    background: var(--color-accent);
+    color: white;
+  }
+
+  .modal-details {
+    padding: 3rem;
+  }
+
+  .modal-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+  }
+
+  .modal-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .modal-tag {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .modal-description {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    max-width: 800px;
+  }
+  
+  .modal-description :global(h2) {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 2rem 0 1rem;
+    color: var(--color-text);
+  }
+  
+  .modal-description :global(p) {
+    margin-bottom: 1.5rem;
+  }
+  
+  .modal-description :global(ul) {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+  }
+  
+  .modal-description :global(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .modal-container {
+      max-height: calc(100vh - var(--header-height) - 3rem);
+      border-radius: 15px;
+    }
+    
+    .modal-image-wrapper {
+      height: 200px;
+    }
+    
+    .modal-details {
+      padding: 1.5rem;
+    }
+    
+    .modal-title {
+      font-size: 1.75rem;
+    }
+    
+    .modal-links {
+      position: static;
+      margin-top: 1rem;
+      padding: 0 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  }
+</style>

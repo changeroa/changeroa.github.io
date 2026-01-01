@@ -1,18 +1,18 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import PageHeader from '../../components/PageHeader.astro';
-import SkillCategory from '../../components/SkillCategory.astro';
-import ScrollReveal from '../../components/ScrollReveal.astro';
-import { useTranslations } from '../../i18n/translations';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import SkillCategory from '../components/SkillCategory.astro';
+import ScrollReveal from '../components/ScrollReveal.astro';
+import { useTranslations } from '../i18n/translations';
+import { getPageTitle } from '../data/site';
+import { skills } from '../data/skills';
 
-const t = useTranslations('ko');
-
-const frontendSkills = ['JavaScript / TypeScript', 'React / Next.js', 'Vue / Nuxt', 'HTML & CSS', 'Tailwind CSS'];
-const backendSkills = ['Node.js', 'Python', 'PostgreSQL', 'MongoDB', 'REST & GraphQL'];
-const toolsSkills = ['Git & GitHub', 'Docker', 'Linux', 'VS Code', 'Figma'];
+const lang = 'ko';
+const t = useTranslations(lang);
+const pageTitle = getPageTitle('about', lang);
 ---
 
-<BaseLayout title="소개 | 조재표">
+<BaseLayout title={pageTitle}>
   <section class="about-section">
     <div class="container">
       <ScrollReveal animation="fade-up">
@@ -38,9 +38,9 @@ const toolsSkills = ['Git & GitHub', 'Docker', 'Linux', 'VS Code', 'Figma'];
           <div class="skills-section">
             <h3>{t('about.skills.title')}</h3>
             <div class="skills-grid">
-              <SkillCategory title={t('about.skills.frontend')} skills={frontendSkills} />
-              <SkillCategory title={t('about.skills.backend')} skills={backendSkills} />
-              <SkillCategory title={t('about.skills.tools')} skills={toolsSkills} />
+              <SkillCategory title={t('about.skills.frontend')} skills={skills.frontend} />
+              <SkillCategory title={t('about.skills.backend')} skills={skills.backend} />
+              <SkillCategory title={t('about.skills.tools')} skills={skills.tools} />
             </div>
           </div>
         </ScrollReveal>

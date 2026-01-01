@@ -1,14 +1,18 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import SocialCard from '../../components/SocialCard.astro';
-import ContactForm from '../../components/ContactForm.astro';
-import ScrollReveal from '../../components/ScrollReveal.astro';
-import { useTranslations } from '../../i18n/translations';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SocialCard from '../components/SocialCard.astro';
+import ContactForm from '../components/ContactForm.astro';
+import ScrollReveal from '../components/ScrollReveal.astro';
+import { useTranslations } from '../i18n/translations';
+import { getPageTitle, socialCards } from '../data/site';
 
-const t = useTranslations('ko');
+const lang = 'ko';
+const t = useTranslations(lang);
+const pageTitle = getPageTitle('contact', lang);
+const cards = socialCards[lang];
 ---
 
-<BaseLayout title="연락처 | 조재표">
+<BaseLayout title={pageTitle}>
   <section class="contact-section">
     <div class="container">
       <div class="contact-layout">
@@ -20,7 +24,7 @@ const t = useTranslations('ko');
           
           <ScrollReveal animation="fade-up" delay={200}>
             <div class="form-wrapper">
-              <ContactForm lang="ko" />
+              <ContactForm lang={lang} />
             </div>
           </ScrollReveal>
         </div>
@@ -28,10 +32,15 @@ const t = useTranslations('ko');
         <div class="links-side">
           <ScrollReveal animation="fade-left" delay={100}>
             <div class="social-grid">
-              <SocialCard href="https://github.com" icon="github" label="팔로우" value="GitHub" delay={100} />
-              <SocialCard href="https://linkedin.com" icon="linkedin" label="연결하기" value="LinkedIn" delay={200} />
-              <SocialCard href="https://instagram.com" icon="instagram" label="팔로우" value="Instagram" delay={300} />
-              <SocialCard href="mailto:hello@example.com" icon="email" label="보내기" value="이메일" delay={400} />
+              {cards.map((card, i) => (
+                <SocialCard 
+                  href={card.href} 
+                  icon={card.icon as any} 
+                  label={card.label} 
+                  value={card.value} 
+                  delay={(i + 1) * 100} 
+                />
+              ))}
             </div>
           </ScrollReveal>
         </div>
@@ -56,7 +65,6 @@ const t = useTranslations('ko');
     align-items: center;
   }
 
-  /* Text Content Side */
   .content-side {
     padding-right: 2rem;
   }
@@ -87,51 +95,12 @@ const t = useTranslations('ko');
     margin-top: 2rem;
   }
 
-  .btn-primary {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    background: var(--color-text);
-    color: var(--color-bg);
-    padding: 1.25rem 2.5rem;
-    border-radius: 100px;
-    font-weight: 600;
-    font-size: 1.125rem;
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
-  }
-
-  body.dark .btn-primary:hover {
-    box-shadow: 0 20px 40px -10px rgba(255,255,255,0.1);
-  }
-
-  /* Social Links Side */
   .social-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
   }
 
-  /* Animations */
-  .slide-up {
-    opacity: 0;
-    transform: translateY(30px);
-    animation: slideUpFade 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-    animation-delay: var(--delay, 0ms);
-  }
-
-  @keyframes slideUpFade {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* Responsive */
   @media (max-width: 900px) {
     .contact-layout {
       grid-template-columns: 1fr;

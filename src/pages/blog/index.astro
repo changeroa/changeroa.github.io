@@ -1,15 +1,15 @@
 ---
-import BaseLayout from '../../../layouts/BaseLayout.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { useTranslations } from '../../../i18n/translations';
+import { useTranslations } from '../../i18n/translations';
 
-const t = useTranslations('en');
+const t = useTranslations('ko');
 const allPosts = await getCollection('blog');
-const posts = allPosts.filter(post => post.id.startsWith('en/'));
+const posts = allPosts.filter(post => post.id.startsWith('ko/'));
 const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -17,7 +17,7 @@ function formatDate(date: Date): string {
 }
 ---
 
-<BaseLayout title="Blog | Victor Jaepyo Jo">
+<BaseLayout title="블로그 | 조재표">
   <section class="blog-section">
     <div class="container">
       <h1 class="page-title">{t('blog.title')}</h1>
@@ -27,7 +27,7 @@ function formatDate(date: Date): string {
         <div class="posts-list">
           {sortedPosts.map((post) => (
             <article class="post-card">
-              <a href={`/en/blog/${post.id.replace('en/', '')}`} class="post-link">
+              <a href={`/blog/${post.id.replace('ko/', '')}`} class="post-link">
                 <div class="post-meta">
                   <time datetime={post.data.pubDate.toISOString()}>
                     {formatDate(post.data.pubDate)}

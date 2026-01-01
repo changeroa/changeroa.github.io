@@ -1,11 +1,21 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { useTranslations } from '../../i18n/translations';
+import { useTranslations, type Lang } from '../../i18n/translations';
+import { getPageTitle } from '../../data/site';
 
-const t = useTranslations('ko');
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'ko' } },
+    { params: { lang: 'en' } }
+  ];
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const t = useTranslations(lang);
+const pageTitle = getPageTitle('work', lang);
 ---
 
-<BaseLayout title="경력 | 조재표">
+<BaseLayout title={pageTitle}>
   <section class="work-section">
     <div class="container">
       <h1 class="page-title">{t('work.title')}</h1>
@@ -29,7 +39,7 @@ const t = useTranslations('ko');
         
         <div class="cta-section">
           <p class="cta-text">{t('work.cta.text')}</p>
-          <a href="/ko/contact" class="btn">{t('work.cta.button')}</a>
+          <a href={`/${lang}/contact`} class="btn">{t('work.cta.button')}</a>
         </div>
         
         <div class="perks">

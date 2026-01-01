@@ -1,0 +1,223 @@
+---
+import ImageWithSkeleton from './ImageWithSkeleton.astro';
+
+interface Props {
+  id: string;
+  title: string;
+  description: string;
+  image?: string;
+  technologies: string[];
+  viewDetailsLabel?: string;
+}
+
+const { 
+  id,
+  title, 
+  description, 
+  image, 
+  technologies, 
+  viewDetailsLabel = '자세히 보기'
+} = Astro.props;
+---
+
+<article 
+  class="project-card" 
+  data-cursor-hover
+  data-modal-trigger={id}
+>
+  <div class="card-glow"></div>
+  <div class="card-inner">
+    <div class="project-image-column">
+      {image ? (
+        <ImageWithSkeleton 
+          src={image} 
+          alt={title}
+          aspectRatio="16/10"
+          class="project-image"
+        />
+      ) : (
+        <div class="image-placeholder">
+          <div class="placeholder-pattern"></div>
+        </div>
+      )}
+    </div>
+    
+    <div class="project-content-column">
+      <div class="content-header">
+        <h2 class="project-title">{title}</h2>
+        {technologies.length > 0 && (
+          <div class="tech-stack-mini">
+            {technologies.slice(0, 3).map((tech) => (
+              <span class="tech-dot" title={tech}></span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <p class="project-summary">{description}</p>
+      
+      <div class="content-footer">
+        {technologies.length > 0 && (
+          <div class="project-tags">
+            {technologies.slice(0, 4).map((tech) => (
+              <span class="tech-tag">{tech}</span>
+            ))}
+            {technologies.length > 4 && (
+              <span class="tech-tag more">+{technologies.length - 4}</span>
+            )}
+          </div>
+        )}
+        <span class="view-details">
+          {viewDetailsLabel}
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </span>
+      </div>
+    </div>
+  </div>
+</article>
+
+<style>
+  .project-card {
+    position: relative;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .project-card:hover {
+    transform: scale(1.01);
+  }
+
+  .card-inner {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.05);
+    height: 100%;
+  }
+
+  :global(.dark) .card-inner {
+    border-color: rgba(255,255,255,0.05);
+    background: var(--color-surface-dark);
+  }
+
+  @media (min-width: 768px) {
+    .card-inner {
+      flex-direction: row;
+      height: 280px;
+    }
+    
+    .project-image-column {
+      width: 35%;
+      flex-shrink: 0;
+    }
+    
+    .project-content-column {
+      width: 65%;
+    }
+  }
+
+  .project-image-column {
+    position: relative;
+    height: 200px;
+    background: var(--color-bg);
+  }
+
+  @media (min-width: 768px) {
+    .project-image-column {
+      height: 100%;
+    }
+  }
+
+  .image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--color-bg), var(--color-surface));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .project-content-column {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  .content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .project-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  .project-summary {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .content-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+  }
+
+  .project-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .tech-tag {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    font-weight: 500;
+    border: 1px solid transparent;
+  }
+
+  .project-card:hover .tech-tag {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .view-details {
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+    color: var(--color-accent);
+  }
+
+  .project-card:hover .view-details {
+    opacity: 1;
+    transform: translateX(0);
+  }
+</style>

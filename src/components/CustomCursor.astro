@@ -73,66 +73,104 @@
   }
 </style>
 
-<script>
-  declare global {
-    interface Window {
-      __cursorState?: {
-        initialized: boolean;
-        animationId: number;
-        mouseX: number;
-        mouseY: number;
-        cleanup?: () => void;
-      };
-    }
-  }
-
+<script is:inline>
   // 상수
   const DOT_SIZE = 8;
   const RING_SIZE = 40;
   const RING_HOVER_SIZE = 60;
   const LERP_FACTOR = 0.18; // ring 따라오는 속도 (0.1 = 느림, 0.3 = 빠름)
+  
+  // 전역 상태
+  window.__cursorState = window.__cursorState || {
+    initialized: false,
+    animationId: 0,
+    mouseX: -100,
+    mouseY: -100,
+    isVisible: false
+  };
 
-  function getCursorPos(): { x: number; y: number } {
+  // 마우스 추적 설정 상태
+  window.__mouseTrackerSetup = window.__mouseTrackerSetup || false;
+  
+  // 저장된 커서 위치 가져오기
+  function getCursorPos() {
     try {
       const saved = sessionStorage.getItem('cursorPos');
       if (saved) {
         const pos = JSON.parse(saved);
         if (pos.x > 0 && pos.y > 0) return pos;
       }
-    } catch {}
+    } catch (e) {
+      console.error('Failed to read cursor position:', e);
+    }
     return { x: -100, y: -100 };
   }
 
-  function saveCursorPos(x: number, y: number): void {
+  // 커서 위치 저장
+  function saveCursorPos(x, y) {
     if (x < 0 || y < 0) return;
     try {
       sessionStorage.setItem('cursorPos', JSON.stringify({ x, y }));
-    } catch {}
+    } catch (e) {
+      console.error('Failed to save cursor position:', e);
+    }
   }
 
-  function initCursor(): void {
-    // 이미 초기화된 경우 정리 후 재초기화
-    if (window.__cursorState?.cleanup) {
+  // 마우스 위치 전역 추적 설정
+  function setupMouseTracking() {
+    // 이미 설정되어 있으면 무시
+    if (window.__mouseTrackerSetup) return;
+    
+    // 마우스 이동 시 위치 저장
+    const trackMousePosition = function(e) {
+      window.__cursorState.mouseX = e.clientX;
+      window.__cursorState.mouseY = e.clientY;
+      window.__cursorState.lastMoveTime = Date.now();
+    };
+    
+    // 마우스 추적 리스너
+    document.addEventListener('mousemove', trackMousePosition, { passive: true });
+    window.__mouseTrackerSetup = true;
+  }
+
+  // 커서 초기화
+  function initCursor() {
+    // 이전 상태 정리
+    if (window.__cursorState.cleanup) {
       window.__cursorState.cleanup();
     }
 
-    const dot = document.querySelector('.cursor-dot') as HTMLElement | null;
-    const ring = document.querySelector('.cursor-ring') as HTMLElement | null;
+    // DOM 요소 가져오기
+    const dot = document.querySelector('.cursor-dot');
+    const ring = document.querySelector('.cursor-ring');
     
+    // 요소가 없으면 종료
     if (!dot || !ring) return;
 
-    // 상태 초기화
+    // 마우스 위치 결정 (우선순위: 전역 추적 > 저장된 위치)
     const savedPos = getCursorPos();
-    let mouseX = savedPos.x;
-    let mouseY = savedPos.y;
+    let mouseX = -100;
+    let mouseY = -100;
+    
+    if (window.__cursorState.mouseX > 0 && window.__cursorState.mouseY > 0) {
+      // 전역 추적된 최신 마우스 위치 사용
+      mouseX = window.__cursorState.mouseX;
+      mouseY = window.__cursorState.mouseY;
+    } else if (savedPos.x > 0 && savedPos.y > 0) {
+      // 세션에 저장된 위치 사용
+      mouseX = savedPos.x;
+      mouseY = savedPos.y;
+    }
+    
+    // 커서 상태 초기화
     let ringX = mouseX;
     let ringY = mouseY;
     let isVisible = false;
     let isHovering = false;
     let animationId = 0;
 
-    // 초기 위치 설정 (저장된 위치가 유효한 경우)
-    if (savedPos.x > 0 && savedPos.y > 0) {
+    // 초기 위치 설정 (유효한 위치가 있는 경우)
+    if (mouseX > 0 && mouseY > 0) {
       const dotOffset = DOT_SIZE / 2;
       const ringOffset = RING_SIZE / 2;
       
@@ -143,37 +181,39 @@
       isVisible = true;
     }
 
-    // 마우스 이동 핸들러 (최적화됨)
-    function onMouseMove(e: MouseEvent): void {
+    // 마우스 이동 핸들러
+    function onMouseMove(e) {
       mouseX = e.clientX;
       mouseY = e.clientY;
 
-      // visibility 상태 변경 시에만 opacity 설정
+      // 필요할 때만 표시 설정 (최적화)
       if (!isVisible) {
         dot.style.opacity = '1';
         ring.style.opacity = '1';
         isVisible = true;
       }
 
-      // dot은 즉시 따라감 (GPU transform)
+      // dot은 즉시 이동 (GPU transform)
       const dotOffset = DOT_SIZE / 2;
       dot.style.transform = `translate3d(${mouseX - dotOffset}px, ${mouseY - dotOffset}px, 0)`;
     }
 
-    // 마우스 이탈
-    function onMouseLeave(): void {
+    // 마우스 이탈 처리
+    function onMouseLeave() {
       dot.style.opacity = '0';
       ring.style.opacity = '0';
       isVisible = false;
-      // 페이지 이탈 시에만 저장
+      
+      // 페이지 이탈 시 위치 저장
       saveCursorPos(mouseX, mouseY);
     }
 
-    // 마우스 진입
-    function onMouseEnter(e: MouseEvent): void {
+    // 마우스 진입 처리
+    function onMouseEnter(e) {
       mouseX = e.clientX;
       mouseY = e.clientY;
-      // 진입 시 ring도 즉시 위치로 점프
+      
+      // Ring도 즉시 위치로 이동 (지연 없이)
       ringX = mouseX;
       ringY = mouseY;
 
@@ -187,8 +227,8 @@
       isVisible = true;
     }
 
-    // Ring 애니메이션 (lerp로 부드럽게 따라감)
-    function animateRing(): void {
+    // Ring 애니메이션 (LERP로 부드럽게)
+    function animateRing() {
       // Linear interpolation
       ringX += (mouseX - ringX) * LERP_FACTOR;
       ringY += (mouseY - ringY) * LERP_FACTOR;
@@ -199,18 +239,19 @@
       animationId = requestAnimationFrame(animateRing);
     }
 
-    // Hover 리스너 설정
-    function onHoverEnter(): void {
+    // 요소 Hover 처리
+    function onHoverEnter() {
       isHovering = true;
       ring.classList.add('hovering');
     }
 
-    function onHoverLeave(): void {
+    function onHoverLeave() {
       isHovering = false;
       ring.classList.remove('hovering');
     }
 
-    function setupHoverListeners(): void {
+    // Hover 리스너 설정
+    function setupHoverListeners() {
       const hoverables = document.querySelectorAll('a, button, [data-cursor-hover]');
       hoverables.forEach(el => {
         el.addEventListener('mouseenter', onHoverEnter);
@@ -219,8 +260,8 @@
     }
 
     // 페이지 visibility 변경 시 저장
-    function onVisibilityChange(): void {
-      if (document.hidden) {
+    function onVisibilityChange() {
+      if (document.hidden && mouseX > 0 && mouseY > 0) {
         saveCursorPos(mouseX, mouseY);
       }
     }
@@ -231,17 +272,25 @@
     document.addEventListener('mouseenter', onMouseEnter);
     document.addEventListener('visibilitychange', onVisibilityChange);
     
+    // Hover 이벤트 설정
     setupHoverListeners();
+    
+    // 애니메이션 시작
     animationId = requestAnimationFrame(animateRing);
 
-    // Cleanup 함수
-    function cleanup(): void {
-      cancelAnimationFrame(animationId);
+    // 정리 함수
+    function cleanup() {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+      
+      // 이벤트 리스너 제거
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseleave', onMouseLeave);
       document.removeEventListener('mouseenter', onMouseEnter);
       document.removeEventListener('visibilitychange', onVisibilityChange);
       
+      // Hover 리스너 제거
       const hoverables = document.querySelectorAll('a, button, [data-cursor-hover]');
       hoverables.forEach(el => {
         el.removeEventListener('mouseenter', onHoverEnter);
@@ -249,24 +298,74 @@
       });
     }
 
-    // 전역 상태 저장
+    // 전역 상태 업데이트
     window.__cursorState = {
       initialized: true,
       animationId,
       mouseX,
       mouseY,
+      isVisible,
+      lastMoveTime: Date.now(),
       cleanup
     };
   }
 
-  // 초기화
+  // 페이지 전환 후 커서 즉시 복원
+  function restoreCursorAfterSwap() {
+    const dot = document.querySelector('.cursor-dot');
+    const ring = document.querySelector('.cursor-ring');
+    
+    if (!dot || !ring) return;
+    
+    // 마우스 위치가 유효하면 즉시 커서 표시
+    if (window.__cursorState && window.__cursorState.mouseX > 0 && window.__cursorState.mouseY > 0) {
+      const dotOffset = DOT_SIZE / 2;
+      const ringOffset = RING_SIZE / 2;
+      
+      // 바로 위치 설정
+      dot.style.transform = `translate3d(${window.__cursorState.mouseX - dotOffset}px, ${window.__cursorState.mouseY - dotOffset}px, 0)`;
+      ring.style.transform = `translate3d(${window.__cursorState.mouseX - ringOffset}px, ${window.__cursorState.mouseY - ringOffset}px, 0)`;
+      
+      // 즉시 표시
+      dot.style.opacity = '1';
+      ring.style.opacity = '1';
+    }
+  }
+
+  // 초기 설정: 마우스 추적 시작
+  setupMouseTracking();
+
+  // 초기 로드 시 초기화
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initCursor);
   } else {
     initCursor();
   }
   
-  // Astro View Transitions 지원
-  document.addEventListener('astro:page-load', initCursor);
-  document.addEventListener('astro:after-swap', initCursor);
+  // Astro View Transitions 이벤트 처리
+  
+  // 페이지 로드 시
+  document.addEventListener('astro:page-load', () => {
+    setupMouseTracking();
+    initCursor();
+  });
+  
+  // 페이지 전환 전
+  document.addEventListener('astro:before-swap', () => {
+    if (window.__cursorState && window.__cursorState.mouseX > 0 && window.__cursorState.mouseY > 0) {
+      saveCursorPos(window.__cursorState.mouseX, window.__cursorState.mouseY);
+    }
+  });
+  
+  // 페이지 전환 직후 - 가장 중요!
+  document.addEventListener('astro:after-swap', () => {
+    // 최소한의 지연으로 DOM 업데이트 후 커서 복원
+    setTimeout(() => {
+      // 1. 먼저 커서를 현재 위치에 즉시 표시
+      restoreCursorAfterSwap();
+      
+      // 2. 그 후 완전한 초기화 (이벤트 등)
+      initCursor();
+    }, 10); // 10ms 지연 (필요한 최소 시간)
+  });
 </script>

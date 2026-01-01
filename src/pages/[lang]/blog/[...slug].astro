@@ -1,24 +1,38 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
-import { useTranslations } from '../../../i18n/translations';
-
-const t = useTranslations('en');
+import { useTranslations, type Lang } from '../../../i18n/translations';
+import { site } from '../../../data/site';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog');
-  const posts = allPosts.filter(post => post.id.startsWith('en/'));
-  return posts.map((post) => ({
-    params: { slug: post.id.replace('en/', '') },
-    props: { post },
-  }));
+  const paths = [];
+  
+  for (const lang of ['ko', 'en']) {
+    const posts = allPosts.filter(post => post.id.startsWith(`${lang}/`));
+    for (const post of posts) {
+      paths.push({
+        params: { 
+          lang, 
+          slug: post.id.replace(`${lang}/`, '') 
+        },
+        props: { post, lang },
+      });
+    }
+  }
+  
+  return paths;
 }
 
-const { post } = Astro.props;
+const { post, lang } = Astro.props;
+const t = useTranslations(lang as Lang);
 const { Content } = await render(post);
 
+const dateLocale = lang === 'ko' ? 'ko-KR' : 'en-US';
+const pageTitle = `${post.data.title} | ${site.title[lang as Lang]}`;
+
 function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString(dateLocale, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -26,11 +40,11 @@ function formatDate(date: Date): string {
 }
 ---
 
-<BaseLayout title={`${post.data.title} | Victor Jaepyo Jo`} description={post.data.description}>
+<BaseLayout title={pageTitle} description={post.data.description}>
   <article class="blog-post">
     <div class="container">
       <header class="post-header">
-        <a href="/en/blog" class="back-link">&larr; {t('blog.backToBlog')}</a>
+        <a href={`/${lang}/blog`} class="back-link">&larr; {t('blog.backToBlog')}</a>
         <h1 class="post-title">{post.data.title}</h1>
         <div class="post-meta">
           <time datetime={post.data.pubDate.toISOString()}>

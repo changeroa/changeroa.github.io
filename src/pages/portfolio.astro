@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+import { useTranslations } from '../i18n/translations';
+import ProjectFilter from '../components/ProjectFilter.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ProjectModal from '../components/ProjectModal.astro';
+import ScrollReveal from '../components/ScrollReveal.astro';
+
+const t = useTranslations('ko');
+const projects = await getCollection('portfolio');
+const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
+
+const projectsWithContent = await Promise.all(sortedProjects.map(async (project) => {
+  const { Content } = await render(project);
+  return { ...project, Content };
+}));
+
+const allTags = [...new Set(projectsWithContent.flatMap(p => p.data.technologies))];
+---
+
+<BaseLayout title="포트폴리오 | 조재표">
+  <section class="portfolio-section">
+    <div class="container">
+      <ScrollReveal animation="fade-up">
+        <header class="page-header">
+          <h1 class="page-title">{t('portfolio.title')}</h1>
+          <p class="page-subtitle">{t('portfolio.subtitle')}</p>
+        </header>
+      </ScrollReveal>
+      
+      {projectsWithContent.length > 0 && (
+        <ScrollReveal animation="fade-up" delay={100}>
+          <ProjectFilter tags={allTags} allLabel="전체" />
+        </ScrollReveal>
+      )}
+      
+      {projectsWithContent.length > 0 ? (
+        <div class="projects-list">
+          {projectsWithContent.map((project, index) => (
+            <ScrollReveal animation="fade-up" delay={150 + index * 100}>
+              <ProjectCard
+                id={project.id}
+                title={project.data.title}
+                description={project.data.description}
+                image={project.data.image}
+                technologies={project.data.technologies}
+                viewDetailsLabel="자세히 보기"
+              />
+            </ScrollReveal>
+          ))}
+        </div>
+      ) : (
+        <div class="empty-state">
+          <p>{t('portfolio.empty')}</p>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- 프로젝트별 모달 (빌드 타임 HTML 생성) -->
+  {projectsWithContent.map((project) => (
+    <ProjectModal
+      id={project.id}
+      title={project.data.title}
+      image={project.data.image}
+      github={project.data.github}
+      demo={project.data.demo}
+      technologies={project.data.technologies}
+      closeLabel="닫기"
+      githubLabel="GitHub"
+      demoLabel="데모 보기"
+    >
+      <project.Content />
+    </ProjectModal>
+  ))}
+</BaseLayout>
+
+<style>
+  .portfolio-section {
+    padding: 6rem 0;
+    min-height: 100vh;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+
+  .page-title {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    line-height: 0.9;
+    margin-bottom: 1rem;
+    letter-spacing: -0.04em;
+    color: var(--color-text);
+  }
+
+  .page-subtitle {
+    color: var(--color-text-muted);
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--color-text-muted);
+  }
+</style>

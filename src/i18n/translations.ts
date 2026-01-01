@@ -78,6 +78,18 @@ export const translations = {
 
     // Footer
     'footer.credit': 'Designed & Built by Victor Jaepyo Jo',
+
+    // 404 page
+    '404.title': '404 - Page Not Found',
+    '404.heading': 'Oops!',
+    '404.subheading': 'Page not found',
+    '404.description': "The page you're looking for doesn't exist or has been moved.",
+    '404.homeButton': 'Go Home',
+    '404.backButton': 'Go Back',
+
+    // Common
+    'common.skipToContent': 'Skip to content',
+    'common.backToTop': 'Back to top',
   },
   ko: {
     // Navigation
@@ -149,6 +161,18 @@ export const translations = {
 
     // Footer
     'footer.credit': 'Victor Jaepyo Jo가 디자인하고 개발했습니다',
+
+    // 404 page
+    '404.title': '404 - 페이지를 찾을 수 없습니다',
+    '404.heading': '이런!',
+    '404.subheading': '페이지를 찾을 수 없습니다',
+    '404.description': '찾으시는 페이지가 존재하지 않거나 이동되었습니다.',
+    '404.homeButton': '홈으로',
+    '404.backButton': '뒤로 가기',
+
+    // Common
+    'common.skipToContent': '본문으로 건너뛰기',
+    'common.backToTop': '맨 위로',
   },
 } as const;
 
@@ -168,5 +192,10 @@ export function useTranslations(lang: Lang) {
 
 export function getLocalizedPath(path: string, lang: Lang): string {
   const cleanPath = path.replace(/^\/(en|ko)/, '');
-  return `/${lang}${cleanPath || '/'}`;
+  
+  if (lang === defaultLang) {
+    return `${cleanPath || '/'}`;
+  } else {
+    return `/${lang}${cleanPath || '/'}`;
+  }
 }

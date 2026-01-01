@@ -9,6 +9,7 @@ import JsonLd from '../components/JsonLd.astro';
 import ScrollProgress from '../components/ScrollProgress.astro';
 import BackToTop from '../components/BackToTop.astro';
 import { getLangFromUrl, useTranslations } from '../i18n/translations';
+import { seo } from '../data/site';
 
 interface Props {
   title?: string;
@@ -22,15 +23,15 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
 const { 
-  title = "Victor Jaepyo Jo | Full-stack Developer", 
-  description = "Portfolio of Victor Jaepyo Jo - Full-stack Developer",
+  title = seo.defaultTitle[lang], 
+  description = seo.defaultDescription[lang],
   image,
   type = 'website',
   noindex = false,
 } = Astro.props;
 
-const skipText = lang === 'ko' ? '본문으로 건너뛰기' : 'Skip to content';
-const backToTopLabel = lang === 'ko' ? '맨 위로' : 'Back to top';
+const skipText = t('common.skipToContent');
+const backToTopLabel = t('common.backToTop');
 ---
 
 <!DOCTYPE html>
@@ -55,7 +56,7 @@ const backToTopLabel = lang === 'ko' ? '맨 위로' : 'Back to top';
     <JsonLd type="WebSite" lang={lang} />
     <JsonLd type="Person" lang={lang} />
     
-    <ViewTransitions />
+    <ViewTransitions fallback="swap" />
     
     <script is:inline>
       (function() {

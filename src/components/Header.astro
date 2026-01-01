@@ -2,6 +2,7 @@
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import { getLangFromUrl, useTranslations } from '../i18n/translations';
+import { identity, menuSocials } from '../data/site';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -26,7 +27,7 @@ const isActive = (path: string) => {
         </svg>
       </a>
       <h5 class="identity">
-        <span class="nickname">victor</span>/<span class="fullname">jaepyo jo</span>
+        <span class="nickname">{identity.nickname}</span>/<span class="fullname">{identity.fullname}</span>
       </h5>
     </div>
     <div class="right-part">
@@ -92,9 +93,11 @@ const isActive = (path: string) => {
     </nav>
     <div class="menu-footer">
       <div class="menu-socials">
-        <a href="#" class="social-link" data-cursor-hover>GitHub <span class="arrow">↗</span></a>
-        <a href="#" class="social-link" data-cursor-hover>LinkedIn <span class="arrow">↗</span></a>
-        <a href="#" class="social-link" data-cursor-hover>Instagram <span class="arrow">↗</span></a>
+        {menuSocials.map(social => (
+          <a href={social.href} target="_blank" rel="noopener" class="social-link" data-cursor-hover>
+            {social.name} <span class="arrow">↗</span>
+          </a>
+        ))}
       </div>
     </div>
   </div>
