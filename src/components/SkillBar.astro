@@ -1,0 +1,147 @@
+---
+interface Props {
+  name: string;
+  level: number; // 0-100
+  color?: string;
+  showPercentage?: boolean;
+  animateOnView?: boolean;
+}
+
+const {
+  name,
+  level,
+  color = 'var(--color-accent)',
+  showPercentage = true,
+  animateOnView = true,
+} = Astro.props;
+
+const clampedLevel = Math.min(100, Math.max(0, level));
+---
+
+<div class="skill-bar" data-animate={animateOnView}>
+  <div class="skill-header">
+    <span class="skill-name">{name}</span>
+    {showPercentage && <span class="skill-percentage">{clampedLevel}%</span>}
+  </div>
+  <div class="skill-track">
+    <div 
+      class="skill-progress" 
+      style={`--progress: ${clampedLevel}%; --progress-color: ${color};`}
+      role="progressbar"
+      aria-valuenow={clampedLevel}
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-label={`${name}: ${clampedLevel}%`}
+    >
+      <div class="progress-glow"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .skill-bar {
+    margin-bottom: 1.25rem;
+  }
+
+  .skill-bar:last-child {
+    margin-bottom: 0;
+  }
+
+  .skill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .skill-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .skill-percentage {
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    color: var(--color-text-muted);
+  }
+
+  .skill-track {
+    height: 8px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 100px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  :global(.dark) .skill-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .skill-progress {
+    height: 100%;
+    width: 0;
+    background: var(--progress-color);
+    border-radius: 100px;
+    position: relative;
+    transition: width 1s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .skill-bar.animated .skill-progress {
+    width: var(--progress);
+  }
+
+  .progress-glow {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background: var(--progress-color);
+    border-radius: 50%;
+    opacity: 0;
+    filter: blur(8px);
+    transition: opacity 0.3s ease;
+  }
+
+  .skill-bar.animated .progress-glow {
+    opacity: 0.6;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .skill-progress {
+      transition: none;
+      width: var(--progress);
+    }
+  }
+</style>
+
+<script>
+  function initSkillBars() {
+    const skillBars = document.querySelectorAll('.skill-bar[data-animate="true"]');
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animated');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    skillBars.forEach((bar) => observer.observe(bar));
+
+    // Immediately animate bars that don't need intersection
+    document.querySelectorAll('.skill-bar:not([data-animate="true"])').forEach((bar) => {
+      bar.classList.add('animated');
+    });
+  }
+
+  initSkillBars();
+  document.addEventListener('astro:page-load', initSkillBars);
+</script>

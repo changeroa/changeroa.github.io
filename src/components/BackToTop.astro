@@ -1,0 +1,115 @@
+---
+interface Props {
+  showAfter?: number; // pixels scrolled before showing
+  label?: string;
+}
+
+const { showAfter = 300, label = 'Back to top' } = Astro.props;
+---
+
+<button 
+  class="back-to-top" 
+  aria-label={label}
+  data-show-after={showAfter}
+  data-cursor-hover
+>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m18 15-6-6-6 6"/>
+  </svg>
+</button>
+
+<style>
+  .back-to-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 100;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  :global(.dark) .back-to-top {
+    background: var(--color-surface-dark);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .back-to-top:hover {
+    background: var(--color-accent);
+    color: white;
+    border-color: var(--color-accent);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+  }
+
+  .back-to-top:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .back-to-top svg {
+    transition: transform 0.2s ease;
+  }
+
+  .back-to-top:hover svg {
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    .back-to-top {
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 44px;
+      height: 44px;
+    }
+  }
+</style>
+
+<script>
+  function initBackToTop() {
+    const button = document.querySelector('.back-to-top') as HTMLButtonElement;
+    if (!button) return;
+
+    const showAfter = parseInt(button.dataset.showAfter || '300', 10);
+
+    const toggleVisibility = () => {
+      if (window.scrollY > showAfter) {
+        button.classList.add('visible');
+      } else {
+        button.classList.remove('visible');
+      }
+    };
+
+    const scrollToTop = () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    };
+
+    window.addEventListener('scroll', toggleVisibility, { passive: true });
+    button.addEventListener('click', scrollToTop);
+    toggleVisibility();
+  }
+
+  initBackToTop();
+  document.addEventListener('astro:page-load', initBackToTop);
+</script>

@@ -1,0 +1,62 @@
+---
+interface Props {
+  color?: string;
+  height?: string;
+  position?: 'top' | 'bottom';
+}
+
+const { 
+  color = 'var(--color-accent)', 
+  height = '3px',
+  position = 'top'
+} = Astro.props;
+---
+
+<div 
+  class="scroll-progress" 
+  style={`--progress-color: ${color}; --progress-height: ${height}; ${position === 'bottom' ? 'top: auto; bottom: 0;' : ''}`}
+  aria-hidden="true"
+>
+  <div class="scroll-progress-bar"></div>
+</div>
+
+<style>
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--progress-height);
+    z-index: 9998;
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .scroll-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--progress-color), var(--color-accent-secondary, var(--progress-color)));
+    transition: width 0.1s ease-out;
+    border-radius: 0 2px 2px 0;
+  }
+</style>
+
+<script>
+  function initScrollProgress() {
+    const progressBar = document.querySelector('.scroll-progress-bar') as HTMLElement;
+    if (!progressBar) return;
+
+    const updateProgress = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressBar.style.width = `${Math.min(progress, 100)}%`;
+    };
+
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  }
+
+  initScrollProgress();
+  document.addEventListener('astro:page-load', initScrollProgress);
+</script>

@@ -1,0 +1,163 @@
+---
+interface Props {
+  href: string;
+  label?: string;
+  filename?: string;
+  variant?: 'primary' | 'outline' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const {
+  href,
+  label = 'Download Resume',
+  filename = 'resume.pdf',
+  variant = 'primary',
+  size = 'md',
+} = Astro.props;
+
+const sizeClasses = {
+  sm: 'size-sm',
+  md: 'size-md',
+  lg: 'size-lg',
+};
+---
+
+<a 
+  href={href} 
+  download={filename}
+  class={`resume-download ${variant} ${sizeClasses[size]}`}
+  data-cursor-hover
+>
+  <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/>
+    <line x1="12" y1="15" x2="12" y2="3"/>
+  </svg>
+  <span class="download-label">{label}</span>
+  <span class="download-badge">PDF</span>
+</a>
+
+<style>
+  .resume-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.5rem;
+    border-radius: 100px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Sizes */
+  .size-sm {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    gap: 0.5rem;
+  }
+
+  .size-md {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .size-lg {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+    gap: 1rem;
+  }
+
+  /* Variants */
+  .primary {
+    background: var(--color-accent);
+    color: white;
+    border: none;
+  }
+
+  .primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+  }
+
+  .outline {
+    background: transparent;
+    color: var(--color-text);
+    border: 2px solid currentColor;
+  }
+
+  .outline:hover {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .ghost {
+    background: transparent;
+    color: var(--color-accent);
+    border: none;
+  }
+
+  .ghost:hover {
+    background: rgba(99, 102, 241, 0.1);
+  }
+
+  /* Elements */
+  .download-icon {
+    transition: transform 0.3s ease;
+  }
+
+  .resume-download:hover .download-icon {
+    transform: translateY(2px);
+    animation: bounce 0.6s ease infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(3px); }
+  }
+
+  .download-label {
+    flex: 1;
+  }
+
+  .download-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .outline .download-badge,
+  .ghost .download-badge {
+    background: rgba(99, 102, 241, 0.2);
+    color: var(--color-accent);
+  }
+
+  .outline:hover .download-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+
+  /* Focus */
+  .resume-download:focus-visible {
+    outline: 3px solid var(--color-accent-secondary);
+    outline-offset: 2px;
+  }
+
+  /* Size adjustments for icons */
+  .size-sm .download-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .size-lg .download-icon {
+    width: 24px;
+    height: 24px;
+  }
+</style>

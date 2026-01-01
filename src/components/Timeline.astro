@@ -1,0 +1,233 @@
+---
+interface TimelineItem {
+  title: string;
+  company?: string;
+  location?: string;
+  startDate: string;
+  endDate?: string; // undefined = present
+  description?: string;
+  highlights?: string[];
+  type?: 'work' | 'education' | 'project';
+}
+
+interface Props {
+  items: TimelineItem[];
+  presentLabel?: string;
+}
+
+const { items, presentLabel = 'Present' } = Astro.props;
+
+const getIcon = (type: string = 'work') => {
+  switch (type) {
+    case 'education':
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/></svg>`;
+    case 'project':
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`;
+    default: // work
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`;
+  }
+};
+---
+
+<div class="timeline">
+  {items.map((item, index) => (
+    <div class="timeline-item" data-type={item.type || 'work'}>
+      <div class="timeline-marker">
+        <div class="marker-icon" set:html={getIcon(item.type)} />
+        {index < items.length - 1 && <div class="marker-line"></div>}
+      </div>
+      
+      <div class="timeline-content">
+        <div class="timeline-header">
+          <h3 class="timeline-title">{item.title}</h3>
+          <span class="timeline-date">
+            {item.startDate} — {item.endDate || presentLabel}
+          </span>
+        </div>
+        
+        {(item.company || item.location) && (
+          <div class="timeline-meta">
+            {item.company && <span class="meta-company">{item.company}</span>}
+            {item.company && item.location && <span class="meta-separator">•</span>}
+            {item.location && <span class="meta-location">{item.location}</span>}
+          </div>
+        )}
+        
+        {item.description && (
+          <p class="timeline-description">{item.description}</p>
+        )}
+        
+        {item.highlights && item.highlights.length > 0 && (
+          <ul class="timeline-highlights">
+            {item.highlights.map((highlight) => (
+              <li>{highlight}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .timeline {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .timeline-item {
+    display: flex;
+    gap: 1.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .timeline-item:last-child {
+    padding-bottom: 0;
+  }
+
+  .timeline-marker {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .marker-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 2px solid var(--color-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent);
+    z-index: 1;
+    transition: all 0.3s ease;
+  }
+
+  :global(.dark) .marker-icon {
+    background: var(--color-surface-dark);
+  }
+
+  .timeline-item:hover .marker-icon {
+    background: var(--color-accent);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .marker-line {
+    position: absolute;
+    top: 44px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: calc(100% - 44px + 2.5rem);
+    background: linear-gradient(to bottom, var(--color-accent), transparent);
+  }
+
+  .timeline-content {
+    flex: 1;
+    padding-top: 0.5rem;
+  }
+
+  .timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .timeline-date {
+    font-size: 0.875rem;
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+    white-space: nowrap;
+  }
+
+  .timeline-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .meta-separator {
+    opacity: 0.5;
+  }
+
+  .timeline-description {
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    margin: 0 0 1rem;
+  }
+
+  .timeline-highlights {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .timeline-highlights li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .timeline-highlights li::before {
+    content: '▹';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+  }
+
+  .timeline-highlights li:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 600px) {
+    .timeline-item {
+      gap: 1rem;
+    }
+
+    .marker-icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    .marker-icon svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .marker-line {
+      top: 36px;
+      height: calc(100% - 36px + 2.5rem);
+    }
+
+    .timeline-header {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .timeline-title {
+      font-size: 1.1rem;
+    }
+  }
+</style>
