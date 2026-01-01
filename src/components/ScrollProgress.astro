@@ -34,9 +34,11 @@ const {
 
   .scroll-progress-bar {
     height: 100%;
-    width: 0%;
+    width: 100%;
     background: linear-gradient(90deg, var(--progress-color), var(--color-accent-secondary, var(--progress-color)));
-    transition: width 0.1s ease-out;
+    transform: scaleX(0);
+    transform-origin: left;
+    will-change: transform;
     border-radius: 0 2px 2px 0;
   }
 </style>
@@ -46,14 +48,24 @@ const {
     const progressBar = document.querySelector('.scroll-progress-bar') as HTMLElement;
     if (!progressBar) return;
 
+    let ticking = false;
+
     const updateProgress = () => {
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      progressBar.style.width = `${Math.min(progress, 100)}%`;
+      const progress = docHeight > 0 ? Math.min(scrollTop / docHeight, 1) : 0;
+      progressBar.style.transform = `scaleX(${progress})`;
+      ticking = false;
     };
 
-    window.addEventListener('scroll', updateProgress, { passive: true });
+    const onScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
     updateProgress();
   }
 

@@ -57,9 +57,6 @@ const backToTopLabel = lang === 'ko' ? '맨 위로' : 'Back to top';
     
     <ViewTransitions />
     
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    
     <script is:inline>
       (function() {
         const theme = localStorage.getItem('theme');
@@ -80,7 +77,6 @@ const backToTopLabel = lang === 'ko' ? '맨 위로' : 'Back to top';
       <p>{t('footer.credit')} &copy; {new Date().getFullYear()}</p>
     </footer>
     <BackToTop label={backToTopLabel} />
-    <div class="noise" aria-hidden="true"></div>
     <CustomCursor transition:persist />
     <script is:inline>
       if (document.documentElement.classList.contains('dark')) {

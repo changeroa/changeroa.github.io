@@ -56,6 +56,8 @@
 </style>
 
 <script>
+  let themeController: AbortController | null = null;
+
   function getTheme(): 'light' | 'dark' {
     const stored = localStorage.getItem('theme');
     if (stored === 'dark' || stored === 'light') return stored;
@@ -68,26 +70,24 @@
   }
 
   function initThemeToggle() {
+    if (themeController) {
+      themeController.abort();
+    }
+    themeController = new AbortController();
+    const { signal } = themeController;
+
     const themeToggle = document.querySelector('.theme-toggle');
     
     if (themeToggle) {
-      // Clone to remove existing listeners
-      const newToggle = themeToggle.cloneNode(true);
-      themeToggle.parentNode?.replaceChild(newToggle, themeToggle);
-      
-      newToggle.addEventListener('click', () => {
+      themeToggle.addEventListener('click', () => {
         const currentTheme = document.body.classList.contains('dark') ? 'dark' : 'light';
         setTheme(currentTheme === 'dark' ? 'light' : 'dark');
-      });
+      }, { signal });
     }
     
-    // Ensure theme is applied
     setTheme(getTheme());
   }
 
-  // Initial setup
   initThemeToggle();
-
-  // Re-init on View Transitions navigation
   document.addEventListener('astro:page-load', initThemeToggle);
 </script>
