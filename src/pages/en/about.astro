@@ -1,0 +1,115 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import SkillCategory from '../../components/SkillCategory.astro';
+import { useTranslations } from '../../i18n/translations';
+
+const t = useTranslations('en');
+
+const frontendSkills = ['JavaScript / TypeScript', 'React / Next.js', 'Vue / Nuxt', 'HTML & CSS', 'Tailwind CSS'];
+const backendSkills = ['Node.js', 'Python', 'PostgreSQL', 'MongoDB', 'REST & GraphQL'];
+const toolsSkills = ['Git & GitHub', 'Docker', 'Linux', 'VS Code', 'Figma'];
+---
+
+<BaseLayout title="About | Victor Jaepyo Jo">
+  <section class="about-section">
+    <div class="container">
+      <PageHeader title={t('about.title')} />
+      
+      <div class="about-content">
+        <div class="about-intro">
+          <h2>{t('about.greeting')}</h2>
+          <p set:html={t('about.intro')}></p>
+        </div>
+        
+        <div class="about-section-block">
+          <h3>{t('about.whatIDo.title')}</h3>
+          <p>{t('about.whatIDo.content')}</p>
+        </div>
+        
+        <div class="skills-section">
+          <h3>{t('about.skills.title')}</h3>
+          <div class="skills-grid">
+            <SkillCategory title={t('about.skills.frontend')} skills={frontendSkills} />
+            <SkillCategory title={t('about.skills.backend')} skills={backendSkills} />
+            <SkillCategory title={t('about.skills.tools')} skills={toolsSkills} />
+          </div>
+        </div>
+        
+        <div class="about-section-block">
+          <h3>{t('about.notCoding.title')}</h3>
+          <p>{t('about.notCoding.content')}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about-section {
+    padding: 4rem 0;
+    min-height: calc(100vh - 160px);
+  }
+
+  .about-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .about-intro {
+    margin-bottom: 3rem;
+  }
+
+  .about-intro h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--color-accent), #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .about-intro p {
+    font-size: 1.125rem;
+    color: var(--color-text);
+    line-height: 1.8;
+  }
+
+  .about-intro :global(strong) {
+    color: var(--color-accent);
+  }
+
+  .about-section-block {
+    margin-bottom: 3rem;
+  }
+
+  .about-section-block h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+
+  .about-section-block p {
+    color: var(--color-text-muted);
+    line-height: 1.8;
+  }
+
+  .skills-section {
+    margin-bottom: 3rem;
+  }
+
+  .skills-section h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--color-text);
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+  }
+</style>

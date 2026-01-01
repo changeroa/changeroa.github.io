@@ -1,0 +1,157 @@
+---
+import SocialIcons from './icons/SocialIcons.astro';
+
+interface Props {
+  href: string;
+  icon: 'github' | 'linkedin' | 'instagram' | 'email';
+  label: string;
+  value: string;
+  delay?: number;
+}
+
+const { href, icon, label, value, delay = 0 } = Astro.props;
+---
+
+<a 
+  href={href} 
+  class="social-card slide-up" 
+  style={`--delay: ${delay}ms`}
+  aria-label={value}
+  target={href.startsWith('mailto:') ? undefined : '_blank'}
+  rel={href.startsWith('mailto:') ? undefined : 'noopener'}
+  data-cursor-hover
+>
+  <div class="icon-box">
+    <SocialIcons name={icon} size={24} />
+  </div>
+  <div class="card-info">
+    <span class="label">{label}</span>
+    <span class="value">{value}</span>
+  </div>
+  <div class="arrow-icon">
+    <SocialIcons name="arrow-up-right" size={20} />
+  </div>
+</a>
+
+<style>
+  .social-card {
+    background: var(--color-surface);
+    border: 1px solid rgba(0,0,0,0.05);
+    padding: 2rem;
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 200px;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  :global(body.dark) .social-card {
+    border: 1px solid rgba(255,255,255,0.05);
+    background: var(--color-surface-dark);
+  }
+
+  .social-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--color-accent);
+    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.05);
+  }
+
+  .icon-box {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg);
+    border-radius: 12px;
+    color: var(--color-text);
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  :global(body.dark) .icon-box {
+    background: rgba(255,255,255,0.05);
+    color: var(--color-text-dark);
+  }
+
+  .social-card:hover .icon-box {
+    background: var(--color-accent);
+    color: white;
+  }
+
+  .card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .label {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  .value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .arrow-icon {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    color: var(--color-text-muted);
+    opacity: 0;
+    transform: translate(-10px, 10px);
+    transition: all 0.3s ease;
+  }
+
+  .social-card:hover .arrow-icon {
+    opacity: 1;
+    transform: translate(0, 0);
+    color: var(--color-accent);
+  }
+
+  /* Animation */
+  .slide-up {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: slideUpFade 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    animation-delay: var(--delay, 0ms);
+  }
+
+  @keyframes slideUpFade {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 600px) {
+    .social-card {
+      min-height: auto;
+      flex-direction: row;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.5rem;
+    }
+    
+    .icon-box {
+      margin-bottom: 0;
+    }
+    
+    .arrow-icon {
+      top: 50%;
+      right: 1.5rem;
+      transform: translateY(-50%) translate(-10px, 0);
+    }
+    
+    .social-card:hover .arrow-icon {
+      transform: translateY(-50%) translate(0, 0);
+    }
+  }
+</style>

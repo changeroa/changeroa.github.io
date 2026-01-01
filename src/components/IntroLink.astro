@@ -1,0 +1,56 @@
+---
+interface Props {
+  href: string;
+  text: string;
+}
+
+const { href, text } = Astro.props;
+---
+
+<a href={href} class="intro-link" data-cursor-hover>
+  <span class="arrow">&rarr;</span>
+  <span class="link-text">{text}</span>
+  <span class="link-underline"></span>
+</a>
+
+<style>
+  .intro-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.125rem;
+    font-weight: 500;
+    position: relative;
+    width: fit-content;
+    padding: 0.5rem 0;
+  }
+
+  .arrow {
+    transition: transform 0.3s ease;
+  }
+
+  .intro-link:hover .arrow {
+    transform: translateX(4px);
+  }
+
+  .link-text {
+    position: relative;
+  }
+
+  .link-underline {
+    position: absolute;
+    bottom: 0;
+    left: 2rem;
+    right: 0;
+    height: 2px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+  }
+
+  .intro-link:hover .link-underline {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+</style>

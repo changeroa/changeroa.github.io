@@ -1,0 +1,689 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+import { useTranslations } from '../../i18n/translations';
+
+const t = useTranslations('en');
+const projects = await getCollection('portfolio');
+const sortedProjects = projects.sort((a, b) => a.data.order - b.data.order);
+
+// Pre-render content for modal usage
+const projectsWithContent = await Promise.all(sortedProjects.map(async (project) => {
+  const { Content } = await render(project);
+  return { ...project, Content };
+}));
+---
+
+<BaseLayout title="Portfolio | Victor Jaepyo Jo">
+  <section class="portfolio-section">
+    <div class="container">
+      <header class="page-header">
+        <h1 class="page-title">{t('portfolio.title')}</h1>
+        <p class="page-subtitle">{t('portfolio.subtitle')}</p>
+      </header>
+      
+      {projectsWithContent.length > 0 ? (
+        <div class="projects-list">
+          {projectsWithContent.map((project) => (
+            <article 
+              class="project-card" 
+              data-cursor-hover
+              data-title={project.data.title}
+              data-image={project.data.image}
+              data-github={project.data.github}
+              data-demo={project.data.demo}
+            >
+              <div class="card-glow"></div>
+              <div class="card-inner">
+                <div class="project-image-column">
+                  {project.data.image ? (
+                    <div class="image-wrapper">
+                      <img 
+                        src={project.data.image} 
+                        alt={project.data.title} 
+                        loading="lazy"
+                      />
+                      <div class="image-overlay"></div>
+                    </div>
+                  ) : (
+                    <div class="image-placeholder">
+                      <div class="placeholder-pattern"></div>
+                    </div>
+                  )}
+                </div>
+                
+                <div class="project-content-column">
+                  <div class="content-header">
+                    <h2 class="project-title">{project.data.title}</h2>
+                    {project.data.technologies.length > 0 && (
+                      <div class="tech-stack-mini">
+                        {project.data.technologies.slice(0, 3).map((tech) => (
+                          <span class="tech-dot" title={tech}></span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <p class="project-summary">{project.data.description}</p>
+                  
+                  <div class="content-footer">
+                    {project.data.technologies.length > 0 && (
+                      <div class="project-tags">
+                        {project.data.technologies.slice(0, 4).map((tech) => (
+                          <span class="tech-tag">{tech}</span>
+                        ))}
+                        {project.data.technologies.length > 4 && (
+                          <span class="tech-tag more">+{project.data.technologies.length - 4}</span>
+                        )}
+                      </div>
+                    )}
+                    <span class="view-details">
+                      View Details 
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Hidden content for modal -->
+              <div class="hidden-content" style="display: none;">
+                <div class="full-description">
+                  <project.Content />
+                </div>
+                <div class="all-tags">
+                  {JSON.stringify(project.data.technologies)}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="empty-state">
+          <p>{t('portfolio.empty')}</p>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- Project Detail Modal -->
+  <div id="project-modal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-container">
+      <button class="modal-close" aria-label="Close modal" data-cursor-hover>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      
+      <div class="modal-content">
+        <div class="modal-image-wrapper">
+          <img id="modal-image" src="" alt="" />
+          <div class="modal-links">
+            <a id="modal-github" href="#" target="_blank" class="modal-link-btn github" style="display: none">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+              <span>GitHub</span>
+            </a>
+            <a id="modal-demo" href="#" target="_blank" class="modal-link-btn demo" style="display: none">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              <span>Live Demo</span>
+            </a>
+          </div>
+        </div>
+        
+        <div class="modal-details">
+          <h2 id="modal-title" class="modal-title"></h2>
+          <div id="modal-tags" class="modal-tags"></div>
+          <div id="modal-description" class="modal-description prose"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // Modal Logic
+  const modal = document.getElementById('project-modal');
+  const closeBtn = document.querySelector('.modal-close');
+  const cards = document.querySelectorAll('.project-card');
+  const body = document.body;
+  
+  // Modal Elements
+  const mImage = document.getElementById('modal-image');
+  const mTitle = document.getElementById('modal-title');
+  const mDesc = document.getElementById('modal-description');
+  const mTags = document.getElementById('modal-tags');
+  const mGithub = document.getElementById('modal-github');
+  const mDemo = document.getElementById('modal-demo');
+
+  function openModal(card: Element) {
+    if (!modal || !mTitle || !mImage || !mDesc || !mTags || !mGithub || !mDemo) return;
+
+    const c = card as HTMLElement;
+    
+    // Populate Data
+    const title = c.dataset.title || '';
+    const image = c.dataset.image || '';
+    const github = c.dataset.github || '';
+    const demo = c.dataset.demo || '';
+    
+    // Get hidden content
+    const fullDescEl = c.querySelector('.full-description');
+    const allTagsEl = c.querySelector('.all-tags');
+    
+    if (!fullDescEl || !allTagsEl) return;
+
+    const fullDesc = fullDescEl.innerHTML;
+    const allTagsContent = allTagsEl.textContent || '[]';
+    let allTags: string[] = [];
+    try {
+      allTags = JSON.parse(allTagsContent);
+    } catch (e) {
+      console.error('Failed to parse tags', e);
+    }
+
+    mTitle.textContent = title;
+    
+    if (mImage instanceof HTMLImageElement) {
+        mImage.src = image;
+    }
+    mImage.style.display = image ? 'block' : 'none';
+    
+    mDesc.innerHTML = fullDesc;
+    
+    // Links
+    if (github) {
+      if (mGithub instanceof HTMLAnchorElement) mGithub.href = github;
+      mGithub.style.display = 'flex';
+    } else {
+      mGithub.style.display = 'none';
+    }
+    
+    if (demo) {
+      if (mDemo instanceof HTMLAnchorElement) mDemo.href = demo;
+      mDemo.style.display = 'flex';
+    } else {
+      mDemo.style.display = 'none';
+    }
+
+    // Tags
+    mTags.innerHTML = allTags.map((tag) => `<span class="modal-tag">${tag}</span>`).join('');
+
+    // Show
+    modal.classList.add('active');
+    body.style.overflow = 'hidden';
+    
+    // Animate
+    requestAnimationFrame(() => {
+      modal.classList.add('visible');
+    });
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.classList.remove('visible');
+    setTimeout(() => {
+      modal.classList.remove('active');
+      body.style.overflow = '';
+    }, 300);
+  }
+
+  // Event Listeners
+  cards.forEach(card => {
+    card.addEventListener('click', () => openModal(card));
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeModal();
+    });
+  }
+
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+      closeModal();
+    }
+  });
+</script>
+
+<style>
+  .portfolio-section {
+    padding: 6rem 0;
+    min-height: 100vh;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+
+  .page-title {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    line-height: 0.9;
+    margin-bottom: 1rem;
+    letter-spacing: -0.04em;
+    color: var(--color-text);
+  }
+
+  .page-subtitle {
+    color: var(--color-text-muted);
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Card Layout */
+  .project-card {
+    position: relative;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .project-card:hover {
+    transform: scale(1.01);
+  }
+
+  .card-inner {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.05);
+    height: 100%;
+  }
+
+  :global(.dark) .card-inner {
+    border-color: rgba(255,255,255,0.05);
+    background: var(--color-surface-dark);
+  }
+
+  @media (min-width: 768px) {
+    .card-inner {
+      flex-direction: row;
+      height: 280px;
+    }
+    
+    .project-image-column {
+      width: 35%;
+      flex-shrink: 0;
+    }
+    
+    .project-content-column {
+      width: 65%;
+    }
+  }
+
+  /* Image Column */
+  .project-image-column {
+    position: relative;
+    height: 200px;
+    background: var(--color-bg);
+  }
+
+  @media (min-width: 768px) {
+    .project-image-column {
+      height: 100%;
+    }
+  }
+
+  .image-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .project-card:hover .image-wrapper img {
+    transform: scale(1.05);
+  }
+
+  .image-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.0);
+    transition: background 0.3s ease;
+  }
+
+  .project-card:hover .image-overlay {
+    background: rgba(0,0,0,0.1);
+  }
+
+  .image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--color-bg), var(--color-surface));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Content Column */
+  .project-content-column {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  .content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .project-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  .project-summary {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .content-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+  }
+
+  .project-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .tech-tag {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    font-weight: 500;
+    border: 1px solid transparent;
+  }
+
+  .project-card:hover .tech-tag {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .view-details {
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+    color: var(--color-accent);
+  }
+
+  .project-card:hover .view-details {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Modal Styles */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .modal-backdrop.active {
+    display: flex;
+  }
+
+  .modal-backdrop.visible {
+    opacity: 1;
+  }
+
+  .modal-container {
+    width: 100%;
+    max-width: 1000px;
+    max-height: 90vh;
+    background: var(--color-surface);
+    border-radius: 20px;
+    position: relative;
+    overflow-y: auto;
+    transform: scale(0.95) translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+  
+  :global(.dark) .modal-container {
+    background: var(--color-surface-dark);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .modal-backdrop.visible .modal-container {
+    transform: scale(1) translateY(0);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 10;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--color-text);
+  }
+  
+  :global(.dark) .modal-close {
+    background: rgba(255,255,255,0.1);
+  }
+
+  .modal-close:hover {
+    transform: rotate(90deg);
+    background: var(--color-accent);
+    color: white;
+  }
+
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-image-wrapper {
+    width: 100%;
+    height: 280px;
+    position: relative;
+    background: #000;
+  }
+
+  .modal-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.9;
+  }
+
+  .modal-links {
+    position: absolute;
+    bottom: 2rem;
+    right: 2rem;
+    display: flex;
+    gap: 1rem;
+  }
+
+  .modal-link-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+  }
+
+  .modal-link-btn:hover {
+    transform: translateY(-2px);
+  }
+  
+  .modal-link-btn.github {
+    background: #24292e;
+    color: white;
+  }
+  
+  .modal-link-btn.demo {
+    background: var(--color-accent);
+    color: white;
+  }
+
+  .modal-details {
+    padding: 3rem;
+  }
+
+  .modal-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+  }
+
+  .modal-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .modal-tag {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .modal-description {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    max-width: 800px;
+  }
+  
+  /* Markdown Content Styles */
+  :global(.prose h2) {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 2rem 0 1rem;
+    color: var(--color-text);
+  }
+  
+  :global(.prose p) {
+    margin-bottom: 1.5rem;
+  }
+  
+  :global(.prose ul) {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+  }
+  
+  :global(.prose li) {
+    margin-bottom: 0.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .modal-container {
+      height: 100vh;
+      max-height: 100vh;
+      border-radius: 0;
+    }
+    
+    .modal-image-wrapper {
+      height: 180px;
+    }
+    
+    .modal-details {
+      padding: 1.5rem;
+    }
+    
+    .modal-title {
+      font-size: 2rem;
+    }
+    
+    .modal-links {
+      position: static;
+      margin-top: 1rem;
+      padding: 0 1.5rem;
+    }
+  }
+</style>

@@ -1,0 +1,154 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { useTranslations } from '../../i18n/translations';
+
+const t = useTranslations('ko');
+---
+
+<BaseLayout title="경력 | 조재표">
+  <section class="work-section">
+    <div class="container">
+      <h1 class="page-title">{t('work.title')}</h1>
+      
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+        </div>
+        
+        <h2 class="empty-title">{t('work.empty.title')}</h2>
+        <p class="empty-subtitle">{t('work.empty.subtitle')}</p>
+        
+        <div class="funny-quote">
+          <p>{t('work.quote.1')}</p>
+          <p>{t('work.quote.2')}</p>
+          <span class="quote-author">{t('work.quote.author')}</span>
+        </div>
+        
+        <div class="cta-section">
+          <p class="cta-text">{t('work.cta.text')}</p>
+          <a href="/ko/contact" class="btn">{t('work.cta.button')}</a>
+        </div>
+        
+        <div class="perks">
+          <h3>{t('work.perks.title')}</h3>
+          <ul>
+            <li>{t('work.perks.1')}</li>
+            <li>{t('work.perks.2')}</li>
+            <li>{t('work.perks.3')}</li>
+            <li>{t('work.perks.4')}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .work-section {
+    padding: 4rem 0;
+    min-height: calc(100vh - 160px);
+  }
+
+  .page-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  .empty-state {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .empty-icon {
+    color: var(--color-accent);
+    margin-bottom: 2rem;
+    opacity: 0.8;
+  }
+
+  .empty-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--color-accent), #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .empty-subtitle {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+  }
+
+  .funny-quote {
+    background: var(--color-surface);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--color-accent);
+  }
+
+  .funny-quote p {
+    font-size: 1.125rem;
+    font-style: italic;
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+
+  .quote-author {
+    display: block;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    font-style: normal;
+  }
+
+  .cta-section {
+    margin-bottom: 3rem;
+  }
+
+  .cta-text {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .perks {
+    text-align: left;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+  }
+
+  .perks h3 {
+    font-size: 1rem;
+    color: var(--color-accent);
+    margin-bottom: 1rem;
+  }
+
+  .perks ul {
+    list-style: none;
+  }
+
+  .perks li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .perks li::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+  }
+</style>

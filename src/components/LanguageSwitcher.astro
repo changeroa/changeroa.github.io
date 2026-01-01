@@ -1,0 +1,45 @@
+---
+import { languages, getLangFromUrl, getLocalizedPath } from '../i18n/translations';
+
+const currentLang = getLangFromUrl(Astro.url);
+const currentPath = Astro.url.pathname;
+---
+
+<div class="lang-switcher">
+  {Object.entries(languages).map(([lang, label]) => (
+    <a
+      href={getLocalizedPath(currentPath, lang as keyof typeof languages)}
+      class:list={['lang-link', { active: currentLang === lang }]}
+      aria-current={currentLang === lang ? 'page' : undefined}
+      data-cursor-hover
+    >
+      {lang.toUpperCase()}
+    </a>
+  ))}
+</div>
+
+<style>
+  .lang-switcher {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .lang-link {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    opacity: 0.5;
+    transition: all 0.2s ease;
+  }
+
+  .lang-link:hover {
+    opacity: 1;
+  }
+
+  .lang-link.active {
+    opacity: 1;
+    background: var(--color-accent);
+    color: white;
+  }
+</style>

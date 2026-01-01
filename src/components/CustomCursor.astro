@@ -1,0 +1,173 @@
+---
+---
+
+<div class="cursor-dot"></div>
+<div class="cursor-ring"></div>
+
+<style>
+  .cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    background: #6366f1;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    will-change: left, top, opacity;
+  }
+
+  .cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #6366f1;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    will-change: left, top, width, height, opacity;
+    transition: width 0.2s ease, height 0.2s ease, background-color 0.2s ease;
+  }
+
+  .cursor-ring.hovering {
+    width: 60px;
+    height: 60px;
+    background: rgba(99, 102, 241, 0.15);
+  }
+
+  @media (pointer: coarse), (hover: none) {
+    .cursor-dot,
+    .cursor-ring {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  declare global {
+    interface Window {
+      __cursorInitialized?: boolean;
+      __cursorAnimationId?: number;
+    }
+  }
+
+  function getCursorPos(): { x: number; y: number } {
+    try {
+      const saved = sessionStorage.getItem('cursorPos');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return { x: -100, y: -100 };
+  }
+
+  function saveCursorPos(x: number, y: number) {
+    try {
+      sessionStorage.setItem('cursorPos', JSON.stringify({ x, y }));
+    } catch {}
+  }
+
+  function initCursor() {
+    if (window.__cursorInitialized) return;
+    window.__cursorInitialized = true;
+
+    const cursorDot = document.querySelector('.cursor-dot') as HTMLElement;
+    const cursorRing = document.querySelector('.cursor-ring') as HTMLElement;
+    
+    if (!cursorDot || !cursorRing) return;
+
+    const savedPos = getCursorPos();
+    let mouseX = savedPos.x;
+    let mouseY = savedPos.y;
+    let ringX = savedPos.x;
+    let ringY = savedPos.y;
+
+    if (savedPos.x > 0 && savedPos.y > 0) {
+      cursorDot.style.left = mouseX + 'px';
+      cursorDot.style.top = mouseY + 'px';
+      cursorRing.style.left = ringX + 'px';
+      cursorRing.style.top = ringY + 'px';
+      cursorDot.style.opacity = '1';
+      cursorRing.style.opacity = '1';
+    }
+
+    const onMouseMove = (e: MouseEvent) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      saveCursorPos(mouseX, mouseY);
+      
+      cursorDot.style.opacity = '1';
+      cursorRing.style.opacity = '1';
+      cursorDot.style.left = mouseX + 'px';
+      cursorDot.style.top = mouseY + 'px';
+    };
+
+    const onMouseLeave = () => {
+      cursorDot.style.opacity = '0';
+      cursorRing.style.opacity = '0';
+    };
+
+    const onMouseEnter = (e: MouseEvent) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      ringX = mouseX;
+      ringY = mouseY;
+      saveCursorPos(mouseX, mouseY);
+      
+      cursorDot.style.left = mouseX + 'px';
+      cursorDot.style.top = mouseY + 'px';
+      cursorRing.style.left = ringX + 'px';
+      cursorRing.style.top = ringY + 'px';
+      cursorDot.style.opacity = '1';
+      cursorRing.style.opacity = '1';
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseleave', onMouseLeave);
+    document.addEventListener('mouseenter', onMouseEnter);
+
+    function setupHoverListeners() {
+      document.querySelectorAll('a, button, [data-cursor-hover]').forEach(el => {
+        el.addEventListener('mouseenter', () => cursorRing.classList.add('hovering'));
+        el.addEventListener('mouseleave', () => cursorRing.classList.remove('hovering'));
+      });
+    }
+
+    setupHoverListeners();
+
+    if (window.__cursorAnimationId) {
+      cancelAnimationFrame(window.__cursorAnimationId);
+    }
+
+    function animateRing() {
+      ringX += (mouseX - ringX) * 0.15;
+      ringY += (mouseY - ringY) * 0.15;
+      
+      cursorRing.style.left = ringX + 'px';
+      cursorRing.style.top = ringY + 'px';
+      
+      window.__cursorAnimationId = requestAnimationFrame(animateRing);
+    }
+    
+    animateRing();
+  }
+
+  function resetCursor() {
+    window.__cursorInitialized = false;
+    initCursor();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCursor);
+  } else {
+    initCursor();
+  }
+  
+  document.addEventListener('astro:page-load', resetCursor);
+  document.addEventListener('astro:after-swap', resetCursor);
+</script>

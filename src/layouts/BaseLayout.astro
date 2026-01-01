@@ -1,0 +1,130 @@
+---
+import { ViewTransitions } from 'astro:transitions';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import CustomCursor from '../components/CustomCursor.astro';
+import { getLangFromUrl, useTranslations } from '../i18n/translations';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const { 
+  title = "Victor Jaepyo Jo | Full-stack Developer", 
+  description = "Portfolio of Victor Jaepyo Jo - Full-stack Developer" 
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="color-scheme" content="dark light" />
+    <title>{title}</title>
+    <ViewTransitions />
+    <script is:inline>
+      (function() {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <Header transition:persist />
+    <main class="main-content" transition:animate="fade">
+      <slot />
+    </main>
+    <footer class="footer">
+      <p>{t('footer.credit')} &copy; {new Date().getFullYear()}</p>
+    </footer>
+    <div class="noise"></div>
+    <CustomCursor transition:persist />
+    <script is:inline>
+      if (document.documentElement.classList.contains('dark')) {
+        document.body.classList.add('dark');
+      }
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  .main-content {
+    min-height: 100vh;
+    padding-top: 100px;
+  }
+
+  .footer {
+    padding: 2rem;
+    text-align: center;
+    font-size: 0.875rem;
+    opacity: 0.5;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: none;
+    transition: all 0.2s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 2px solid currentColor;
+    color: inherit;
+  }
+
+  .btn-outline:hover {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: white;
+  }
+
+  .link-hover {
+    position: relative;
+    display: inline-block;
+  }
+
+  .link-hover::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: currentColor;
+    transition: width 0.3s ease;
+  }
+
+  .link-hover:hover::after {
+    width: 100%;
+  }
+</style>

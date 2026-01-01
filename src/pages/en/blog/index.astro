@@ -1,0 +1,150 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { useTranslations } from '../../../i18n/translations';
+
+const t = useTranslations('en');
+const allPosts = await getCollection('blog');
+const posts = allPosts.filter(post => post.id.startsWith('en/'));
+const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+---
+
+<BaseLayout title="Blog | Victor Jaepyo Jo">
+  <section class="blog-section">
+    <div class="container">
+      <h1 class="page-title">{t('blog.title')}</h1>
+      <p class="page-subtitle">{t('blog.subtitle')}</p>
+      
+      {sortedPosts.length > 0 ? (
+        <div class="posts-list">
+          {sortedPosts.map((post) => (
+            <article class="post-card">
+              <a href={`/en/blog/${post.id.replace('en/', '')}`} class="post-link">
+                <div class="post-meta">
+                  <time datetime={post.data.pubDate.toISOString()}>
+                    {formatDate(post.data.pubDate)}
+                  </time>
+                  {post.data.tags.length > 0 && (
+                    <div class="post-tags">
+                      {post.data.tags.slice(0, 3).map((tag) => (
+                        <span class="tag">#{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <h2 class="post-title">{post.data.title}</h2>
+                <p class="post-description">{post.data.description}</p>
+                <span class="read-more">{t('blog.readMore')} &rarr;</span>
+              </a>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="empty-state">
+          <p>{t('blog.empty')}</p>
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .blog-section {
+    padding: 4rem 0;
+    min-height: calc(100vh - 160px);
+  }
+
+  .page-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
+  .page-subtitle {
+    text-align: center;
+    color: var(--color-text-muted);
+    margin-bottom: 3rem;
+  }
+
+  .posts-list {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .post-card {
+    background: var(--color-surface);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .post-link {
+    display: block;
+    padding: 1.5rem 2rem;
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .post-meta time {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  .post-tags {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .tag {
+    font-size: 0.75rem;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+  }
+
+  .post-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .post-description {
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .read-more {
+    font-size: 0.875rem;
+    color: var(--color-accent);
+    font-weight: 500;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem;
+    color: var(--color-text-muted);
+  }
+</style>
