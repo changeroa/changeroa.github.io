@@ -1,8 +1,17 @@
 ---
+/**
+ * CustomCursor - GPU 가속 커스텀 커서
+ * 
+ * 최적화 포인트:
+ * 1. transform: translate3d() 사용 → GPU Composite-only, Layout/Paint 스킵
+ * 2. will-change: transform, opacity → GPU 레이어 힌트
+ * 3. sessionStorage는 페이지 이탈 시에만 저장 → I/O 최소화
+ * 4. visibility 상태 추적 → 불필요한 스타일 재설정 방지
+ */
 ---
 
-<div class="cursor-dot"></div>
-<div class="cursor-ring"></div>
+<div class="cursor-dot" aria-hidden="true"></div>
+<div class="cursor-ring" aria-hidden="true"></div>
 
 <style>
   .cursor-dot {
@@ -11,13 +20,16 @@
     left: 0;
     width: 8px;
     height: 8px;
-    background: #6366f1;
+    background: var(--color-accent, #6366f1);
     border-radius: 50%;
     pointer-events: none;
     z-index: 99999;
-    transform: translate(-50%, -50%);
     opacity: 0;
-    will-change: left, top, opacity;
+    will-change: transform, opacity;
+    /* 초기 위치: 화면 밖 */
+    transform: translate3d(-100px, -100px, 0);
+    /* 하드웨어 가속 강제 */
+    backface-visibility: hidden;
   }
 
   .cursor-ring {
@@ -26,14 +38,16 @@
     left: 0;
     width: 40px;
     height: 40px;
-    border: 2px solid #6366f1;
+    border: 2px solid var(--color-accent, #6366f1);
     border-radius: 50%;
     pointer-events: none;
     z-index: 99998;
-    transform: translate(-50%, -50%);
     opacity: 0;
-    will-change: left, top, width, height, opacity;
-    transition: width 0.2s ease, height 0.2s ease, background-color 0.2s ease;
+    will-change: transform, opacity;
+    transform: translate3d(-100px, -100px, 0);
+    backface-visibility: hidden;
+    /* hover 효과만 transition (위치는 JS에서 직접 제어) */
+    transition: width 0.15s ease-out, height 0.15s ease-out, background-color 0.15s ease-out;
   }
 
   .cursor-ring.hovering {
@@ -42,7 +56,16 @@
     background: rgba(99, 102, 241, 0.15);
   }
 
+  /* 터치 디바이스에서 숨김 */
   @media (pointer: coarse), (hover: none) {
+    .cursor-dot,
+    .cursor-ring {
+      display: none !important;
+    }
+  }
+
+  /* 모션 감소 설정 존중 */
+  @media (prefers-reduced-motion: reduce) {
     .cursor-dot,
     .cursor-ring {
       display: none !important;
@@ -53,121 +76,197 @@
 <script>
   declare global {
     interface Window {
-      __cursorInitialized?: boolean;
-      __cursorAnimationId?: number;
+      __cursorState?: {
+        initialized: boolean;
+        animationId: number;
+        mouseX: number;
+        mouseY: number;
+        cleanup?: () => void;
+      };
     }
   }
+
+  // 상수
+  const DOT_SIZE = 8;
+  const RING_SIZE = 40;
+  const RING_HOVER_SIZE = 60;
+  const LERP_FACTOR = 0.18; // ring 따라오는 속도 (0.1 = 느림, 0.3 = 빠름)
 
   function getCursorPos(): { x: number; y: number } {
     try {
       const saved = sessionStorage.getItem('cursorPos');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const pos = JSON.parse(saved);
+        if (pos.x > 0 && pos.y > 0) return pos;
+      }
     } catch {}
     return { x: -100, y: -100 };
   }
 
-  function saveCursorPos(x: number, y: number) {
+  function saveCursorPos(x: number, y: number): void {
+    if (x < 0 || y < 0) return;
     try {
       sessionStorage.setItem('cursorPos', JSON.stringify({ x, y }));
     } catch {}
   }
 
-  function initCursor() {
-    if (window.__cursorInitialized) return;
-    window.__cursorInitialized = true;
+  function initCursor(): void {
+    // 이미 초기화된 경우 정리 후 재초기화
+    if (window.__cursorState?.cleanup) {
+      window.__cursorState.cleanup();
+    }
 
-    const cursorDot = document.querySelector('.cursor-dot') as HTMLElement;
-    const cursorRing = document.querySelector('.cursor-ring') as HTMLElement;
+    const dot = document.querySelector('.cursor-dot') as HTMLElement | null;
+    const ring = document.querySelector('.cursor-ring') as HTMLElement | null;
     
-    if (!cursorDot || !cursorRing) return;
+    if (!dot || !ring) return;
 
+    // 상태 초기화
     const savedPos = getCursorPos();
     let mouseX = savedPos.x;
     let mouseY = savedPos.y;
-    let ringX = savedPos.x;
-    let ringY = savedPos.y;
+    let ringX = mouseX;
+    let ringY = mouseY;
+    let isVisible = false;
+    let isHovering = false;
+    let animationId = 0;
 
+    // 초기 위치 설정 (저장된 위치가 유효한 경우)
     if (savedPos.x > 0 && savedPos.y > 0) {
-      cursorDot.style.left = mouseX + 'px';
-      cursorDot.style.top = mouseY + 'px';
-      cursorRing.style.left = ringX + 'px';
-      cursorRing.style.top = ringY + 'px';
-      cursorDot.style.opacity = '1';
-      cursorRing.style.opacity = '1';
+      const dotOffset = DOT_SIZE / 2;
+      const ringOffset = RING_SIZE / 2;
+      
+      dot.style.transform = `translate3d(${mouseX - dotOffset}px, ${mouseY - dotOffset}px, 0)`;
+      ring.style.transform = `translate3d(${ringX - ringOffset}px, ${ringY - ringOffset}px, 0)`;
+      dot.style.opacity = '1';
+      ring.style.opacity = '1';
+      isVisible = true;
     }
 
-    const onMouseMove = (e: MouseEvent) => {
+    // 마우스 이동 핸들러 (최적화됨)
+    function onMouseMove(e: MouseEvent): void {
       mouseX = e.clientX;
       mouseY = e.clientY;
+
+      // visibility 상태 변경 시에만 opacity 설정
+      if (!isVisible) {
+        dot.style.opacity = '1';
+        ring.style.opacity = '1';
+        isVisible = true;
+      }
+
+      // dot은 즉시 따라감 (GPU transform)
+      const dotOffset = DOT_SIZE / 2;
+      dot.style.transform = `translate3d(${mouseX - dotOffset}px, ${mouseY - dotOffset}px, 0)`;
+    }
+
+    // 마우스 이탈
+    function onMouseLeave(): void {
+      dot.style.opacity = '0';
+      ring.style.opacity = '0';
+      isVisible = false;
+      // 페이지 이탈 시에만 저장
       saveCursorPos(mouseX, mouseY);
-      
-      cursorDot.style.opacity = '1';
-      cursorRing.style.opacity = '1';
-      cursorDot.style.left = mouseX + 'px';
-      cursorDot.style.top = mouseY + 'px';
-    };
+    }
 
-    const onMouseLeave = () => {
-      cursorDot.style.opacity = '0';
-      cursorRing.style.opacity = '0';
-    };
-
-    const onMouseEnter = (e: MouseEvent) => {
+    // 마우스 진입
+    function onMouseEnter(e: MouseEvent): void {
       mouseX = e.clientX;
       mouseY = e.clientY;
+      // 진입 시 ring도 즉시 위치로 점프
       ringX = mouseX;
       ringY = mouseY;
-      saveCursorPos(mouseX, mouseY);
+
+      const dotOffset = DOT_SIZE / 2;
+      const ringOffset = (isHovering ? RING_HOVER_SIZE : RING_SIZE) / 2;
       
-      cursorDot.style.left = mouseX + 'px';
-      cursorDot.style.top = mouseY + 'px';
-      cursorRing.style.left = ringX + 'px';
-      cursorRing.style.top = ringY + 'px';
-      cursorDot.style.opacity = '1';
-      cursorRing.style.opacity = '1';
-    };
+      dot.style.transform = `translate3d(${mouseX - dotOffset}px, ${mouseY - dotOffset}px, 0)`;
+      ring.style.transform = `translate3d(${ringX - ringOffset}px, ${ringY - ringOffset}px, 0)`;
+      dot.style.opacity = '1';
+      ring.style.opacity = '1';
+      isVisible = true;
+    }
 
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseleave', onMouseLeave);
-    document.addEventListener('mouseenter', onMouseEnter);
+    // Ring 애니메이션 (lerp로 부드럽게 따라감)
+    function animateRing(): void {
+      // Linear interpolation
+      ringX += (mouseX - ringX) * LERP_FACTOR;
+      ringY += (mouseY - ringY) * LERP_FACTOR;
 
-    function setupHoverListeners() {
-      document.querySelectorAll('a, button, [data-cursor-hover]').forEach(el => {
-        el.addEventListener('mouseenter', () => cursorRing.classList.add('hovering'));
-        el.addEventListener('mouseleave', () => cursorRing.classList.remove('hovering'));
+      const ringOffset = (isHovering ? RING_HOVER_SIZE : RING_SIZE) / 2;
+      ring.style.transform = `translate3d(${ringX - ringOffset}px, ${ringY - ringOffset}px, 0)`;
+
+      animationId = requestAnimationFrame(animateRing);
+    }
+
+    // Hover 리스너 설정
+    function onHoverEnter(): void {
+      isHovering = true;
+      ring.classList.add('hovering');
+    }
+
+    function onHoverLeave(): void {
+      isHovering = false;
+      ring.classList.remove('hovering');
+    }
+
+    function setupHoverListeners(): void {
+      const hoverables = document.querySelectorAll('a, button, [data-cursor-hover]');
+      hoverables.forEach(el => {
+        el.addEventListener('mouseenter', onHoverEnter);
+        el.addEventListener('mouseleave', onHoverLeave);
       });
     }
 
-    setupHoverListeners();
-
-    if (window.__cursorAnimationId) {
-      cancelAnimationFrame(window.__cursorAnimationId);
+    // 페이지 visibility 변경 시 저장
+    function onVisibilityChange(): void {
+      if (document.hidden) {
+        saveCursorPos(mouseX, mouseY);
+      }
     }
 
-    function animateRing() {
-      ringX += (mouseX - ringX) * 0.15;
-      ringY += (mouseY - ringY) * 0.15;
-      
-      cursorRing.style.left = ringX + 'px';
-      cursorRing.style.top = ringY + 'px';
-      
-      window.__cursorAnimationId = requestAnimationFrame(animateRing);
-    }
+    // 이벤트 리스너 등록
+    document.addEventListener('mousemove', onMouseMove, { passive: true });
+    document.addEventListener('mouseleave', onMouseLeave);
+    document.addEventListener('mouseenter', onMouseEnter);
+    document.addEventListener('visibilitychange', onVisibilityChange);
     
-    animateRing();
+    setupHoverListeners();
+    animationId = requestAnimationFrame(animateRing);
+
+    // Cleanup 함수
+    function cleanup(): void {
+      cancelAnimationFrame(animationId);
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseleave', onMouseLeave);
+      document.removeEventListener('mouseenter', onMouseEnter);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      
+      const hoverables = document.querySelectorAll('a, button, [data-cursor-hover]');
+      hoverables.forEach(el => {
+        el.removeEventListener('mouseenter', onHoverEnter);
+        el.removeEventListener('mouseleave', onHoverLeave);
+      });
+    }
+
+    // 전역 상태 저장
+    window.__cursorState = {
+      initialized: true,
+      animationId,
+      mouseX,
+      mouseY,
+      cleanup
+    };
   }
 
-  function resetCursor() {
-    window.__cursorInitialized = false;
-    initCursor();
-  }
-
+  // 초기화
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initCursor);
   } else {
     initCursor();
   }
   
-  document.addEventListener('astro:page-load', resetCursor);
-  document.addEventListener('astro:after-swap', resetCursor);
+  // Astro View Transitions 지원
+  document.addEventListener('astro:page-load', initCursor);
+  document.addEventListener('astro:after-swap', initCursor);
 </script>
