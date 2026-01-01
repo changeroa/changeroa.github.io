@@ -2,6 +2,9 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
 import { useTranslations } from '../../i18n/translations';
+import ProjectFilter from '../../components/ProjectFilter.astro';
+import ScrollReveal from '../../components/ScrollReveal.astro';
+import ImageWithSkeleton from '../../components/ImageWithSkeleton.astro';
 
 const t = useTranslations('en');
 const projects = await getCollection('portfolio');
@@ -12,44 +15,55 @@ const projectsWithContent = await Promise.all(sortedProjects.map(async (project)
   const { Content } = await render(project);
   return { ...project, Content };
 }));
+
+// Collect all unique tags for the filter
+const allTags = [...new Set(projectsWithContent.flatMap(p => p.data.technologies))];
 ---
 
 <BaseLayout title="Portfolio | Victor Jaepyo Jo">
   <section class="portfolio-section">
     <div class="container">
-      <header class="page-header">
-        <h1 class="page-title">{t('portfolio.title')}</h1>
-        <p class="page-subtitle">{t('portfolio.subtitle')}</p>
-      </header>
+      <ScrollReveal animation="fade-up">
+        <header class="page-header">
+          <h1 class="page-title">{t('portfolio.title')}</h1>
+          <p class="page-subtitle">{t('portfolio.subtitle')}</p>
+        </header>
+      </ScrollReveal>
+      
+      {projectsWithContent.length > 0 && (
+        <ScrollReveal animation="fade-up" delay={100}>
+          <ProjectFilter tags={allTags} allLabel="All" />
+        </ScrollReveal>
+      )}
       
       {projectsWithContent.length > 0 ? (
         <div class="projects-list">
-          {projectsWithContent.map((project) => (
-            <article 
-              class="project-card" 
-              data-cursor-hover
-              data-title={project.data.title}
-              data-image={project.data.image}
-              data-github={project.data.github}
-              data-demo={project.data.demo}
-            >
-              <div class="card-glow"></div>
-              <div class="card-inner">
-                <div class="project-image-column">
-                  {project.data.image ? (
-                    <div class="image-wrapper">
-                      <img 
+          {projectsWithContent.map((project, index) => (
+            <ScrollReveal animation="fade-up" delay={150 + index * 100}>
+              <article 
+                class="project-card" 
+                data-cursor-hover
+                data-title={project.data.title}
+                data-image={project.data.image}
+                data-github={project.data.github}
+                data-demo={project.data.demo}
+                data-tags={project.data.technologies.join(',')}
+              >
+                <div class="card-glow"></div>
+                <div class="card-inner">
+                  <div class="project-image-column">
+                    {project.data.image ? (
+                      <ImageWithSkeleton 
                         src={project.data.image} 
-                        alt={project.data.title} 
-                        loading="lazy"
+                        alt={project.data.title}
+                        aspectRatio="16/10"
+                        class="project-image"
                       />
-                      <div class="image-overlay"></div>
-                    </div>
-                  ) : (
-                    <div class="image-placeholder">
-                      <div class="placeholder-pattern"></div>
-                    </div>
-                  )}
+                    ) : (
+                      <div class="image-placeholder">
+                        <div class="placeholder-pattern"></div>
+                      </div>
+                    )}
                 </div>
                 
                 <div class="project-content-column">
@@ -97,9 +111,10 @@ const projectsWithContent = await Promise.all(sortedProjects.map(async (project)
                 </div>
               </div>
             </article>
-          ))}
-        </div>
-      ) : (
+          </ScrollReveal>
+        ))}
+      </div>
+    ) : (
         <div class="empty-state">
           <p>{t('portfolio.empty')}</p>
         </div>

@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SocialCard from '../../components/SocialCard.astro';
+import ContactForm from '../../components/ContactForm.astro';
+import ScrollReveal from '../../components/ScrollReveal.astro';
 import { useTranslations } from '../../i18n/translations';
 
 const t = useTranslations('ko');
@@ -11,27 +13,27 @@ const t = useTranslations('ko');
     <div class="container">
       <div class="contact-layout">
         <div class="content-side">
-          <h1 class="page-title slide-up">{t('contact.title')}</h1>
-          <p class="page-subtitle slide-up" set:html={t('contact.subtitle').replace('\n', '<br />')}></p>
+          <ScrollReveal animation="fade-up">
+            <h1 class="page-title">{t('contact.title')}</h1>
+            <p class="page-subtitle" set:html={t('contact.subtitle').replace('\n', '<br />')}></p>
+          </ScrollReveal>
           
-          <div class="cta-wrapper slide-up">
-            <a href="mailto:hello@example.com" class="btn btn-primary" data-cursor-hover>
-              {t('contact.sayHello')}
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
-            </a>
-          </div>
+          <ScrollReveal animation="fade-up" delay={200}>
+            <div class="form-wrapper">
+              <ContactForm lang="ko" />
+            </div>
+          </ScrollReveal>
         </div>
 
         <div class="links-side">
-          <div class="social-grid">
-            <SocialCard href="https://github.com" icon="github" label="팔로우" value="GitHub" delay={100} />
-            <SocialCard href="https://linkedin.com" icon="linkedin" label="연결하기" value="LinkedIn" delay={200} />
-            <SocialCard href="https://instagram.com" icon="instagram" label="팔로우" value="Instagram" delay={300} />
-            <SocialCard href="mailto:hello@example.com" icon="email" label="보내기" value="이메일" delay={400} />
-          </div>
+          <ScrollReveal animation="fade-left" delay={100}>
+            <div class="social-grid">
+              <SocialCard href="https://github.com" icon="github" label="팔로우" value="GitHub" delay={100} />
+              <SocialCard href="https://linkedin.com" icon="linkedin" label="연결하기" value="LinkedIn" delay={200} />
+              <SocialCard href="https://instagram.com" icon="instagram" label="팔로우" value="Instagram" delay={300} />
+              <SocialCard href="mailto:hello@example.com" icon="email" label="보내기" value="이메일" delay={400} />
+            </div>
+          </ScrollReveal>
         </div>
       </div>
     </div>
@@ -81,7 +83,7 @@ const t = useTranslations('ko');
     word-break: keep-all;
   }
 
-  .cta-wrapper {
+  .form-wrapper {
     margin-top: 2rem;
   }
 
