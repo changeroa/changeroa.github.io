@@ -8,7 +8,7 @@ export default defineConfig({
   site: 'https://changeroa.github.io',
   i18n: {
     locales: ['en', 'ko'],
-    defaultLocale: 'en',
+    defaultLocale: 'ko',
     routing: {
       prefixDefaultLocale: true,
     },
