@@ -2,26 +2,60 @@
 interface Props {
   id: string;
   title: string;
+  subtitle?: string;
   image?: string;
+  heroImage?: string;
   github?: string;
   demo?: string;
+  article?: string;
   technologies: string[];
+  role?: string;
+  duration?: string;
+  teamSize?: string;
+  status?: 'completed' | 'in-progress' | 'maintained';
+  statusLabel?: string;
+  highlights?: string[];
+  gallery?: string[];
+  videoUrl?: string;
   closeLabel?: string;
   githubLabel?: string;
   demoLabel?: string;
+  articleLabel?: string;
 }
 
 const {
   id,
   title,
+  subtitle,
   image,
+  heroImage,
   github,
   demo,
+  article,
   technologies,
+  role,
+  duration,
+  teamSize,
+  status,
+  statusLabel,
+  highlights = [],
+  gallery = [],
+  videoUrl,
   closeLabel = '닫기',
   githubLabel = 'GitHub',
-  demoLabel = '데모 보기'
+  demoLabel = '데모 보기',
+  articleLabel = '관련 글'
 } = Astro.props;
+
+// Function to extract YouTube ID
+const getYoutubeId = (url: string) => {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+};
+
+const youtubeId = videoUrl ? getYoutubeId(videoUrl) : null;
+const displayImage = heroImage || image;
 ---
 
 <div id={`modal-${id}`} class="modal-backdrop" data-modal={id} aria-hidden="true">
@@ -34,44 +68,144 @@ const {
     </button>
     
     <div class="modal-content">
-      {image && (
-        <div class="modal-image-wrapper">
-          <img src={image} alt={title} />
-          <div class="modal-links">
-            {github && (
-              <a href={github} target="_blank" rel="noopener noreferrer" class="modal-link-btn github">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-                <span>{githubLabel}</span>
-              </a>
-            )}
-            {demo && (
-              <a href={demo} target="_blank" rel="noopener noreferrer" class="modal-link-btn demo">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                  <polyline points="15 3 21 3 21 9"></polyline>
-                  <line x1="10" y1="14" x2="21" y2="3"></line>
-                </svg>
-                <span>{demoLabel}</span>
-              </a>
-            )}
+      {/* Media Section: Video or Hero Image */}
+      <div class="modal-media-wrapper">
+        {youtubeId ? (
+          <div class="video-container">
+            <iframe
+              src={`https://www.youtube.com/embed/${youtubeId}`}
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
           </div>
-        </div>
-      )}
-      
-      <div class="modal-details">
-        <h2 class="modal-title">{title}</h2>
-        {technologies.length > 0 && (
-          <div class="modal-tags">
-            {technologies.map((tech) => (
-              <span class="modal-tag">{tech}</span>
-            ))}
+        ) : displayImage && (
+          <div class="image-container">
+            <img src={displayImage} alt={title} />
           </div>
         )}
+      </div>
+
+      <div class="modal-body">
+        {/* Header Section */}
+        <header class="modal-header">
+          <div class="title-row">
+            <h2 class="modal-title">{title}</h2>
+            {status && (
+              <span class={`status-badge ${status}`}>
+                {statusLabel || status}
+              </span>
+            )}
+          </div>
+          {subtitle && <p class="modal-subtitle">{subtitle}</p>}
+        </header>
+
+        {/* Meta Grid */}
+        {(role || duration || teamSize) && (
+          <div class="modal-meta-grid">
+            {role && (
+              <div class="meta-item">
+                <span class="meta-label">ROLE</span>
+                <span class="meta-value">{role}</span>
+              </div>
+            )}
+            {duration && (
+              <div class="meta-item">
+                <span class="meta-label">TIMELINE</span>
+                <span class="meta-value">{duration}</span>
+              </div>
+            )}
+            {teamSize && (
+              <div class="meta-item">
+                <span class="meta-label">TEAM</span>
+                <span class="meta-value">{teamSize}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Action Links */}
+        <div class="modal-actions">
+          {github && (
+            <a href={github} target="_blank" rel="noopener noreferrer" class="action-btn github">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+              <span>{githubLabel}</span>
+            </a>
+          )}
+          {demo && (
+            <a href={demo} target="_blank" rel="noopener noreferrer" class="action-btn demo">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              <span>{demoLabel}</span>
+            </a>
+          )}
+          {article && (
+            <a href={article} target="_blank" rel="noopener noreferrer" class="action-btn article">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <span>{articleLabel}</span>
+            </a>
+          )}
+        </div>
+
+        {/* Highlights */}
+        {highlights.length > 0 && (
+          <div class="highlights-section">
+            <h3 class="section-label">Key Highlights</h3>
+            <ul class="highlights-list">
+              {highlights.map((item) => (
+                <li>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="check-icon">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Main Description */}
         <div class="modal-description prose">
           <slot />
         </div>
+
+        {/* Technologies */}
+        {technologies.length > 0 && (
+          <div class="tech-section">
+            <h3 class="section-label">Technologies</h3>
+            <div class="tech-tags">
+              {technologies.map((tech) => (
+                <span class="tech-tag">{tech}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Gallery */}
+        {gallery.length > 0 && (
+          <div class="gallery-section">
+            <h3 class="section-label">Gallery</h3>
+            <div class="gallery-grid">
+              {gallery.map((img) => (
+                <div class="gallery-item">
+                  <img src={img} alt="" loading="lazy" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   </div>
@@ -88,6 +222,7 @@ const {
       if (!modal) return;
       
       modal.classList.add('active');
+      body.classList.add('modal-open');
       body.style.overflow = 'hidden';
       
       requestAnimationFrame(() => {
@@ -99,6 +234,7 @@ const {
       modal.classList.remove('visible');
       setTimeout(() => {
         modal.classList.remove('active');
+        body.classList.remove('modal-open');
         body.style.overflow = '';
       }, 300);
     }
@@ -141,19 +277,16 @@ const {
 <style>
   .modal-backdrop {
     position: fixed;
-    top: var(--header-height);
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(8px);
-    z-index: 100;
+    z-index: 9000;
     display: none;
     opacity: 0;
     transition: opacity 0.3s ease;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    padding: 1.5rem 1rem;
+    padding: 2rem 1rem;
   }
 
   .modal-backdrop.active {
@@ -166,26 +299,30 @@ const {
 
   .modal-container {
     width: 100%;
-    max-width: 1000px;
-    max-height: calc(100vh - var(--header-height) - 3rem);
+    max-width: 900px;
+    height: 100%;
+    max-height: 90vh;
     background: var(--color-surface);
-    border-radius: 20px;
+    border-radius: 24px;
     position: relative;
     overflow-y: auto;
     transform: scale(0.95) translateY(20px);
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: var(--shadow-xl);
+    display: flex;
+    flex-direction: column;
   }
   
   :global(.dark) .modal-container {
-    background: var(--color-surface-dark);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: var(--color-surface);
+    border: 1px solid rgba(255,255,255,0.05);
   }
 
   .modal-backdrop.visible .modal-container {
     transform: scale(1) translateY(0);
   }
 
+  /* Close Button */
   .modal-close {
     position: absolute;
     top: 1.5rem;
@@ -194,164 +331,361 @@ const {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: rgba(0,0,0,0.2);
+    background: rgba(0,0,0,0.5);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: var(--color-text);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     border: none;
+    backdrop-filter: blur(4px);
   }
   
-  :global(.dark) .modal-close {
-    background: rgba(255,255,255,0.1);
-  }
-
   .modal-close:hover {
-    transform: rotate(90deg);
+    transform: rotate(90deg) scale(1.1);
     background: var(--color-accent);
-    color: white;
   }
 
   .modal-content {
     display: flex;
     flex-direction: column;
+    min-height: 100%;
   }
 
-  .modal-image-wrapper {
+  /* Media Section */
+  .modal-media-wrapper {
     width: 100%;
-    height: 320px;
-    position: relative;
     background: #000;
+    position: relative;
+  }
+
+  .video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    height: 0;
     overflow: hidden;
   }
 
-  .modal-image-wrapper img {
+  .video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .image-container {
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+  }
+
+  .image-container img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.9;
   }
 
-  .modal-links {
-    position: absolute;
-    bottom: 2rem;
-    right: 2rem;
-    display: flex;
-    gap: 1rem;
-  }
-
-  .modal-link-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    background: var(--color-surface);
-    color: var(--color-text);
-    border-radius: 100px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: transform 0.2s ease;
-  }
-
-  .modal-link-btn:hover {
-    transform: translateY(-2px);
-  }
-  
-  .modal-link-btn.github {
-    background: #24292e;
-    color: white;
-  }
-  
-  .modal-link-btn.demo {
-    background: var(--color-accent);
-    color: white;
-  }
-
-  .modal-details {
+  /* Modal Body */
+  .modal-body {
     padding: 3rem;
+  }
+
+  /* Header */
+  .modal-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
   }
 
   .modal-title {
     font-size: 2.5rem;
     font-weight: 900;
-    margin-bottom: 1rem;
     line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0;
   }
 
-  .modal-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-bottom: 2.5rem;
+  .modal-subtitle {
+    font-size: 1.25rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+    margin: 0.5rem 0 0;
+    line-height: 1.4;
   }
 
-  .modal-tag {
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    padding: 0.3rem 0.8rem;
-    border: 1px solid var(--color-accent);
-    color: var(--color-accent);
-    border-radius: 4px;
+  /* Status Badge */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.85rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
 
+  .status-badge.completed {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  .status-badge.in-progress {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  .status-badge.maintained {
+    background: rgba(14, 165, 233, 0.1);
+    color: #0ea5e9;
+    border: 1px solid rgba(14, 165, 233, 0.2);
+  }
+
+  /* Meta Grid */
+  .modal-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: var(--color-bg);
+    border-radius: 16px;
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--color-border);
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .meta-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+
+  .meta-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  /* Actions */
+  .modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .action-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .action-btn.github {
+    background: #24292e;
+    color: white;
+  }
+  
+  :global(.dark) .action-btn.github {
+    background: #374151;
+  }
+
+  .action-btn.demo {
+    background: var(--color-accent);
+    color: white;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  }
+
+  .action-btn.article {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+  }
+  
+  .action-btn.article:hover {
+    background: var(--color-bg);
+  }
+
+  /* Section Styles */
+  .section-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .section-label::after {
+    content: '';
+    height: 1px;
+    flex-grow: 1;
+    background: var(--color-border);
+  }
+
+  /* Highlights */
+  .highlights-section {
+    margin-bottom: 3rem;
+  }
+
+  .highlights-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .highlights-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+
+  .check-icon {
+    color: var(--color-accent);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  /* Description */
   .modal-description {
     font-size: 1.1rem;
     line-height: 1.8;
     color: var(--color-text-muted);
-    max-width: 800px;
+    margin-bottom: 3rem;
   }
   
-  .modal-description :global(h2) {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 2rem 0 1rem;
+  .modal-description :global(h2), 
+  .modal-description :global(h3) {
     color: var(--color-text);
-  }
-  
-  .modal-description :global(p) {
-    margin-bottom: 1.5rem;
-  }
-  
-  .modal-description :global(ul) {
-    margin-bottom: 1.5rem;
-    padding-left: 1.5rem;
-  }
-  
-  .modal-description :global(li) {
-    margin-bottom: 0.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
   }
 
+  .modal-description :global(ul) {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Technologies */
+  .tech-section {
+    margin-bottom: 3rem;
+  }
+
+  .tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .tech-tag {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 0.4rem 1rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    border-radius: 8px;
+    font-weight: 500;
+  }
+
+  /* Gallery */
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .gallery-item {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    background: var(--color-bg);
+    transition: transform 0.3s ease;
+  }
+  
+  .gallery-item:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Responsive */
   @media (max-width: 768px) {
     .modal-container {
-      max-height: calc(100vh - var(--header-height) - 3rem);
-      border-radius: 15px;
+      max-height: 100%;
+      border-radius: 0;
     }
     
-    .modal-image-wrapper {
-      height: 200px;
+    .modal-backdrop {
+      padding: 0;
     }
-    
-    .modal-details {
+
+    .image-container {
+      height: 250px;
+    }
+
+    .modal-body {
       padding: 1.5rem;
     }
-    
+
     .modal-title {
       font-size: 1.75rem;
     }
+
+    .modal-meta-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .gallery-grid {
+      grid-template-columns: 1fr;
+    }
     
-    .modal-links {
-      position: static;
-      margin-top: 1rem;
-      padding: 0 1.5rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
+    .modal-close {
+      top: 1rem;
+      right: 1rem;
     }
   }
 </style>

@@ -78,40 +78,120 @@ const uniqueTags = [...new Set(tags)].sort();
   }
 </style>
 
-<script>
-  function initProjectFilter() {
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const filterableItems = document.querySelectorAll('[data-tags]');
+<script is:inline>
+  (function() {
+    let filterController = null;
 
-    filterBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        // Update active state
-        filterBtns.forEach((b) => b.classList.remove('active'));
-        btn.classList.add('active');
+    function initProjectFilter() {
+      // Abort previous listeners to prevent duplicates
+      if (filterController) {
+        filterController.abort();
+      }
+      filterController = new AbortController();
+      const signal = filterController.signal;
 
-        const filter = (btn as HTMLElement).dataset.filter;
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      const filterableItems = document.querySelectorAll('[data-tags]');
+      const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
 
-        filterableItems.forEach((item) => {
-          const el = item as HTMLElement;
-          const tags = el.dataset.tags?.toLowerCase().split(',').map((t) => t.trim().replace(/\s+/g, '-')) || [];
+      // Debug: verify elements are found
+      if (filterBtns.length === 0) {
+        console.warn('[ProjectFilter] No filter buttons found');
+        return;
+      }
 
-          if (filter === 'all' || tags.includes(filter || '')) {
-            el.style.display = '';
-            el.classList.remove('hidden');
-            // Trigger re-animation if using scroll reveal
-            setTimeout(() => {
-              el.style.opacity = '1';
-              el.style.transform = 'none';
-            }, 50);
+      // Helper to get active filters
+      const getActiveFilters = function() {
+        const activeBtns = document.querySelectorAll('.filter-btn.active:not([data-filter="all"])');
+        return Array.from(activeBtns).map(function(btn) { return btn.dataset.filter; });
+      };
+
+      // Helper to get the wrapper element (ScrollReveal or direct parent)
+      const getFilterWrapper = function(el) {
+        const parent = el.parentElement;
+        if (parent && parent.classList.contains('scroll-reveal')) {
+          return parent;
+        }
+        return el;
+      };
+
+      // Helper to apply filters
+      const applyFilters = function() {
+        const activeFilters = getActiveFilters();
+        const isAllActive = (allBtn && allBtn.classList.contains('active')) || activeFilters.length === 0;
+
+        filterableItems.forEach(function(item) {
+          const el = item;
+          const wrapper = getFilterWrapper(el);
+          const tagsAttr = el.dataset.tags || '';
+          const tags = tagsAttr.toLowerCase().split(',').map(function(t) { 
+            return t.trim().replace(/\s+/g, '-'); 
+          });
+
+          // Logic: Show if 'All' is active, OR if the item has AT LEAST ONE of the active filters
+          const matches = isAllActive || activeFilters.some(function(filter) { 
+            return tags.includes(filter || ''); 
+          });
+
+          if (matches) {
+            if (wrapper.style.display === 'none') {
+              wrapper.style.display = '';
+              wrapper.classList.remove('filter-hidden');
+              // Trigger re-animation on the wrapper
+              wrapper.style.opacity = '0';
+              wrapper.style.transform = 'translateY(20px)';
+              requestAnimationFrame(function() {
+                wrapper.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                wrapper.style.opacity = '1';
+                wrapper.style.transform = 'none';
+              });
+            }
           } else {
-            el.style.display = 'none';
-            el.classList.add('hidden');
+            wrapper.style.display = 'none';
+            wrapper.classList.add('filter-hidden');
           }
         });
-      });
-    });
-  }
+      };
 
-  initProjectFilter();
-  document.addEventListener('astro:page-load', initProjectFilter);
+      filterBtns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const target = e.currentTarget;
+          const filter = target.dataset.filter;
+
+          if (filter === 'all') {
+            // If 'All' clicked, clear others and activate 'All'
+            filterBtns.forEach(function(b) { b.classList.remove('active'); });
+            target.classList.add('active');
+          } else {
+            // Toggle clicked button
+            target.classList.toggle('active');
+            
+            // Remove 'All' active state if any specific tag is selected
+            if (target.classList.contains('active') && allBtn) {
+              allBtn.classList.remove('active');
+            }
+
+            // If no specific tags are active, re-activate 'All'
+            const currentActiveFilters = getActiveFilters();
+            if (currentActiveFilters.length === 0 && allBtn) {
+              allBtn.classList.add('active');
+            }
+          }
+
+          applyFilters();
+        }, { signal: signal });
+      });
+    }
+
+    // Ensure DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initProjectFilter);
+    } else {
+      initProjectFilter();
+    }
+    document.addEventListener('astro:page-load', initProjectFilter);
+  })();
 </script>

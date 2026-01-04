@@ -7,14 +7,19 @@ const currentPath = Astro.url.pathname;
 
 <div class="lang-switcher">
   {Object.entries(languages).map(([lang, label]) => (
-    <a
-      href={getLocalizedPath(currentPath, lang as keyof typeof languages)}
-      class:list={['lang-link', { active: currentLang === lang }]}
-      aria-current={currentLang === lang ? 'page' : undefined}
-      data-cursor-hover
-    >
-      {lang.toUpperCase()}
-    </a>
+    currentLang === lang ? (
+      <span class="lang-link active" aria-current="page">
+        {lang.toUpperCase()}
+      </span>
+    ) : (
+      <a
+        href={getLocalizedPath(currentPath, lang as keyof typeof languages)}
+        class="lang-link"
+        data-cursor-hover
+      >
+        {lang.toUpperCase()}
+      </a>
+    )
   ))}
 </div>
 

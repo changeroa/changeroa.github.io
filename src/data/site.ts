@@ -21,10 +21,10 @@ export const identity = {
 } as const;
 
 export const socials = {
-  github: 'https://github.com',
-  linkedin: 'https://linkedin.com',
-  instagram: 'https://instagram.com',
-  email: 'mailto:hello@example.com',
+  github: 'https://github.com/changeroa',
+  linkedin: 'https://www.linkedin.com/in/victor-jae-pyo-cho-089266223',
+  instagram: 'https://instagram.com/enjolie_laide',
+  email: 'mailto:changeroa@gmail.com',
 } as const;
 
 export const menuSocials = [

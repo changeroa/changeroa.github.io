@@ -90,7 +90,7 @@ const backToTopLabel = t('common.backToTop');
 <style is:global>
   .main-content {
     min-height: 100vh;
-    padding-top: 100px;
+    padding-top: calc(var(--header-height, 70px) + 30px);
   }
 
   .footer {

@@ -21,9 +21,9 @@ const { showAfter = 300, label = 'Back to top' } = Astro.props;
 <style>
   .back-to-top {
     position: fixed;
-    bottom: 2rem;
+    bottom: max(2rem, env(safe-area-inset-bottom, 0px));
     right: 2rem;
-    z-index: 100;
+    z-index: var(--z-back-to-top);
     width: 48px;
     height: 48px;
     border-radius: 50%;
@@ -84,7 +84,15 @@ const { showAfter = 300, label = 'Back to top' } = Astro.props;
 </style>
 
 <script>
+  let backToTopController: AbortController | null = null;
+
   function initBackToTop() {
+    if (backToTopController) {
+      backToTopController.abort();
+    }
+    backToTopController = new AbortController();
+    const { signal } = backToTopController;
+
     const button = document.querySelector('.back-to-top') as HTMLButtonElement;
     if (!button) return;
 
@@ -115,8 +123,8 @@ const { showAfter = 300, label = 'Back to top' } = Astro.props;
       });
     };
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    button.addEventListener('click', scrollToTop);
+    window.addEventListener('scroll', onScroll, { passive: true, signal });
+    button.addEventListener('click', scrollToTop, { signal });
     toggleVisibility();
   }
 

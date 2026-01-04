@@ -68,6 +68,14 @@
   
   --container-max-width: 1200px;
   --header-height: 70px;
+  
+  --z-back-to-top: 50;
+  --z-scroll-progress: 60;
+  --z-menu-overlay: 90;
+  --z-header: 100;
+  --z-header-controls: 101;
+  --z-modal: 1000;
+  --z-cursor: 9999;
 }
 
 html.dark,
@@ -118,6 +126,7 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
 a {

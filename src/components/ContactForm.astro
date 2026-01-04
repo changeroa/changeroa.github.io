@@ -1,10 +1,11 @@
 ---
 interface Props {
   formAction?: string; // Formspree, Web3Forms, etc.
+  accessKey?: string; // Web3Forms access key
   lang?: 'en' | 'ko';
 }
 
-const { formAction = '', lang = 'ko' } = Astro.props;
+const { formAction = 'https://api.web3forms.com/submit', accessKey = '', lang = 'ko' } = Astro.props;
 
 const labels = {
   en: {
@@ -49,6 +50,8 @@ const t = labels[lang];
   data-sending-text={t.sending}
   data-submit-text={t.submit}
 >
+  {accessKey && <input type="hidden" name="access_key" value={accessKey} />}
+  
   <div class="form-group">
     <label for="name" class="form-label">{t.name}</label>
     <input 

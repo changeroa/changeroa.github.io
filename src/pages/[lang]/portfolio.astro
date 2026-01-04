@@ -34,6 +34,13 @@ const labels = {
   viewDetails: lang === 'ko' ? '자세히 보기' : 'View Details',
   close: lang === 'ko' ? '닫기' : 'Close',
   demo: lang === 'ko' ? '데모 보기' : 'Live Demo',
+  article: lang === 'ko' ? '관련 글' : 'Read Article',
+};
+
+const statusMap = {
+  'completed': lang === 'ko' ? '완료' : 'Completed',
+  'in-progress': lang === 'ko' ? '진행 중' : 'In Progress',
+  'maintained': lang === 'ko' ? '유지보수' : 'Maintained'
 };
 ---
 
@@ -77,21 +84,36 @@ const labels = {
   </section>
 
   <!-- 프로젝트별 모달 (빌드 타임 HTML 생성) -->
-  {projectsWithContent.map((project) => (
-    <ProjectModal
-      id={project.id}
-      title={project.data.title}
-      image={project.data.image}
-      github={project.data.github}
-      demo={project.data.demo}
-      technologies={project.data.technologies}
-      closeLabel={labels.close}
-      githubLabel="GitHub"
-      demoLabel={labels.demo}
-    >
-      <project.Content />
-    </ProjectModal>
-  ))}
+  {projectsWithContent.map((project) => {
+    const data = project.data as any;
+    return (
+      <ProjectModal
+        id={project.id}
+        title={data.title}
+        subtitle={data.subtitle}
+        image={data.image}
+        heroImage={data.heroImage}
+        role={data.role}
+        duration={data.duration}
+        teamSize={data.teamSize}
+        status={data.status}
+        statusLabel={(statusMap as Record<string, string>)[data.status] || data.status}
+        highlights={data.highlights}
+        gallery={data.gallery}
+        videoUrl={data.videoUrl}
+        article={data.article}
+        github={data.github}
+        demo={data.demo}
+        technologies={data.technologies}
+        closeLabel={labels.close}
+        githubLabel="GitHub"
+        demoLabel={labels.demo}
+        articleLabel={labels.article}
+      >
+        <project.Content />
+      </ProjectModal>
+    );
+  })}
 </BaseLayout>
 
 <style>

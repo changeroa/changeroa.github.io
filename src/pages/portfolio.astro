@@ -17,6 +17,12 @@ const projectsWithContent = await Promise.all(sortedProjects.map(async (project)
 }));
 
 const allTags = [...new Set(projectsWithContent.flatMap(p => p.data.technologies))];
+
+const statusMap = {
+  'completed': '완료',
+  'in-progress': '진행 중',
+  'maintained': '유지보수'
+};
 ---
 
 <BaseLayout title="포트폴리오 | 조재표">
@@ -59,21 +65,36 @@ const allTags = [...new Set(projectsWithContent.flatMap(p => p.data.technologies
   </section>
 
   <!-- 프로젝트별 모달 (빌드 타임 HTML 생성) -->
-  {projectsWithContent.map((project) => (
-    <ProjectModal
-      id={project.id}
-      title={project.data.title}
-      image={project.data.image}
-      github={project.data.github}
-      demo={project.data.demo}
-      technologies={project.data.technologies}
-      closeLabel="닫기"
-      githubLabel="GitHub"
-      demoLabel="데모 보기"
-    >
-      <project.Content />
-    </ProjectModal>
-  ))}
+      {projectsWithContent.map((project) => {
+        const data = project.data as any;
+        return (
+          <ProjectModal
+            id={project.id}
+            title={data.title}
+            subtitle={data.subtitle}
+            image={data.image}
+            heroImage={data.heroImage}
+            role={data.role}
+            duration={data.duration}
+            teamSize={data.teamSize}
+            status={data.status}
+            statusLabel={(statusMap as Record<string, string>)[data.status] || data.status}
+            highlights={data.highlights}
+            gallery={data.gallery}
+            videoUrl={data.videoUrl}
+            article={data.article}
+            github={data.github}
+            demo={data.demo}
+            technologies={data.technologies}
+            closeLabel="닫기"
+            githubLabel="GitHub"
+            demoLabel="데모 보기"
+            articleLabel="관련 글"
+          >
+            <project.Content />
+          </ProjectModal>
+        );
+      })}
 </BaseLayout>
 
 <style>

@@ -27,7 +27,7 @@ const {
     left: 0;
     right: 0;
     height: var(--progress-height);
-    z-index: 9998;
+    z-index: var(--z-scroll-progress);
     background: transparent;
     pointer-events: none;
   }
@@ -44,7 +44,15 @@ const {
 </style>
 
 <script>
+  let scrollProgressController: AbortController | null = null;
+
   function initScrollProgress() {
+    if (scrollProgressController) {
+      scrollProgressController.abort();
+    }
+    scrollProgressController = new AbortController();
+    const { signal } = scrollProgressController;
+
     const progressBar = document.querySelector('.scroll-progress-bar') as HTMLElement;
     if (!progressBar) return;
 
@@ -65,7 +73,7 @@ const {
       }
     };
 
-    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true, signal });
     updateProgress();
   }
 

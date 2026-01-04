@@ -6,13 +6,14 @@ import { identity, menuSocials } from '../data/site';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-const basePath = `/${lang}`;
+const defaultLang = 'ko';
+const basePath = lang === defaultLang ? '' : `/${lang}`;
 
 const currentPath = Astro.url.pathname;
 
 const isActive = (path: string) => {
-  const normalizedCurrent = currentPath.replace(/\/$/, '');
-  const normalizedPath = path.replace(/\/$/, '');
+  const normalizedCurrent = currentPath.replace(/\/$/, '') || '/';
+  const normalizedPath = path.replace(/\/$/, '') || '/';
   return normalizedCurrent === normalizedPath;
 };
 ---
@@ -20,8 +21,8 @@ const isActive = (path: string) => {
 <header class="header">
   <div class="header-content">
     <div class="left-part">
-      <a href={basePath} class="logo" data-cursor-hover>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" class="logo-icon">
+      <a href={basePath || '/'} class="logo" data-cursor-hover aria-label={lang === 'ko' ? '홈으로' : 'Go to home'}>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" class="logo-icon" aria-hidden="true">
           <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="2"/>
           <text x="24" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="currentColor">V</text>
         </svg>
@@ -33,7 +34,13 @@ const isActive = (path: string) => {
     <div class="right-part">
       <LanguageSwitcher />
       <ThemeToggle />
-      <button class="hamburger-btn" aria-label="Open menu" data-cursor-hover>
+      <button 
+        class="hamburger-btn" 
+        aria-label={lang === 'ko' ? '메뉴' : 'Menu'}
+        aria-expanded="false"
+        aria-controls="main-navigation"
+        data-cursor-hover
+      >
         <div class="hamburger-lines">
           <span class="line line-1"></span>
           <span class="line line-2"></span>
@@ -43,12 +50,19 @@ const isActive = (path: string) => {
   </div>
 </header>
 
-<div class="menu-overlay">
+<div 
+  id="main-navigation" 
+  class="menu-overlay" 
+  role="dialog" 
+  aria-modal="true" 
+  aria-label={lang === 'ko' ? '내비게이션 메뉴' : 'Navigation menu'}
+  aria-hidden="true"
+>
   <div class="menu-content">
     <nav class="menu-nav">
       <ul class="menu-items">
         <li class="menu-item" style="--delay: 0">
-          <a href={basePath} class:list={[{ 'active': isActive(basePath) }]} data-cursor-hover>
+          <a href={basePath || '/'} class:list={[{ 'active': isActive(basePath || '/') }]} data-cursor-hover>
             <span class="item-number">01</span>
             <span class="item-text" data-text={t('nav.home')}>{t('nav.home')}</span>
             <span class="item-underline"></span>
@@ -109,14 +123,24 @@ const isActive = (path: string) => {
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: var(--z-header);
     padding: 1.5rem 2rem;
-    transition: transform 0.3s ease, background-color 0.3s ease;
+    transition: transform 0.3s ease, background-color 0.3s ease, z-index 0s;
     background: var(--color-bg);
   }
 
   :global(body.dark) .header {
     background: var(--color-bg-dark);
+  }
+
+  :global(body.modal-open) .header {
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  :global(body.modal-open) .right-part,
+  :global(body.modal-open) .hamburger-btn {
+    z-index: 1;
   }
 
   .header-content {
@@ -166,7 +190,7 @@ const isActive = (path: string) => {
     align-items: center;
     gap: 1.5rem;
     position: relative;
-    z-index: 1001;
+    z-index: var(--z-header-controls);
     pointer-events: auto;
   }
 
@@ -174,7 +198,7 @@ const isActive = (path: string) => {
     width: 48px;
     height: 48px;
     position: relative;
-    z-index: 1001;
+    z-index: var(--z-header-controls);
     cursor: pointer;
     display: flex;
     justify-content: center;
@@ -216,7 +240,7 @@ const isActive = (path: string) => {
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 999;
+    z-index: var(--z-menu-overlay);
     background: rgba(245, 245, 245, 0.98);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -420,6 +444,28 @@ const isActive = (path: string) => {
     }
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .menu-overlay,
+    .menu-item a,
+    .menu-footer,
+    .line,
+    .item-underline,
+    .social-link,
+    .arrow {
+      transition: none;
+    }
+    
+    .menu-item a {
+      transform: none;
+      opacity: 1;
+    }
+    
+    .menu-footer {
+      transform: none;
+      opacity: 1;
+    }
+  }
+
 </style>
 
 <script>
@@ -432,25 +478,75 @@ const isActive = (path: string) => {
     headerController = new AbortController();
     const { signal } = headerController;
 
-    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    const hamburgerBtn = document.querySelector('.hamburger-btn') as HTMLButtonElement;
+    const menuOverlay = document.querySelector('.menu-overlay') as HTMLElement;
     const body = document.body;
-    const menuLinks = document.querySelectorAll('.menu-overlay a');
+    const menuLinks = document.querySelectorAll('.menu-overlay a') as NodeListOf<HTMLAnchorElement>;
+    const firstMenuItem = document.querySelector('.menu-item a') as HTMLAnchorElement;
+
+    function openMenu() {
+      body.classList.add('menu-open');
+      body.style.overflow = 'hidden';
+      hamburgerBtn?.setAttribute('aria-expanded', 'true');
+      menuOverlay?.setAttribute('aria-hidden', 'false');
+      
+      setTimeout(() => {
+        firstMenuItem?.focus();
+      }, 100);
+    }
+
+    function closeMenu() {
+      body.classList.remove('menu-open');
+      body.style.overflow = '';
+      hamburgerBtn?.setAttribute('aria-expanded', 'false');
+      menuOverlay?.setAttribute('aria-hidden', 'true');
+      hamburgerBtn?.focus();
+    }
+
+    function handleFocusTrap(e: KeyboardEvent) {
+      if (!body.classList.contains('menu-open')) return;
+      
+      const focusableElements = menuOverlay?.querySelectorAll(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      ) as NodeListOf<HTMLElement>;
+      
+      if (!focusableElements || focusableElements.length === 0) return;
+      
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey && document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement.focus();
+      } else if (!e.shiftKey && document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement.focus();
+      }
+    }
 
     if (hamburgerBtn) {
       hamburgerBtn.addEventListener('click', () => {
-        body.classList.toggle('menu-open');
+        const isOpen = body.classList.contains('menu-open');
+        if (isOpen) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
       }, { signal });
     }
 
     menuLinks.forEach(link => {
       link.addEventListener('click', () => {
-        body.classList.remove('menu-open');
+        closeMenu();
       }, { signal });
     });
 
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.key === 'Escape' && body.classList.contains('menu-open')) {
-        body.classList.remove('menu-open');
+        closeMenu();
+      }
+      if (e.key === 'Tab') {
+        handleFocusTrap(e);
       }
     }, { signal });
   }
